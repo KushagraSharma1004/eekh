@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin:  0;
+      padding: 0;
+      font-weight: bold;
+    }
+
+    /* this is the container in which all things are their  */
+    .container {
+      width: 100%;
+      max-width: 400px; /* Set maximum width of the form container */
+      margin: auto;
+      padding: 20px;
+    }
+
+    /* Styles for form inputs */
+    input[type=text] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-weight: bold;
+    }
+
+    /* Styles for submit button */
+    input[type=submit], button {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type=submit]:hover, button:hover {
+      background-color: #45a049;
+      color: white;
+    }
+
+    /* Styles for message div */
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+
+    }
+
+    /* Media query for smaller screens */
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+    }
+</style>
+<body>
+
+<h3>eekh.com</h3>
+
+<div class="container">
+    <form method="POST" name="google-sheet" id="google-sheet-form">
+        <label for="Mobile">Mobile</label>
+        <input type="text" id="lname" name="Mobile" placeholder="Your Mobile No.">
+
+        <label for="name"> Name</label>
+        <input type="text" id="fname" name="Name" placeholder="Name..">
+
+        <label for="Date Of Birth">Date Of Birth</label>
+        <input type="text" id="dob" name="Date Of Birth" placeholder="Date Of Birth">
+
+        <input type="submit" value="Submit" name="Submit" id="submit-button">
+        <button type="button" id="add-button">Add</button>
+    </form>
+
+    <div id="message"></div>
+</div>
+
+
+
+
+<script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxjzUZPHNc6bZAse6g3tyB3oruzOcutkIH9cANSlQAkHve6aA07rtfPb1kyNiBp0392Zg/exec';
+    const form = document.getElementById('google-sheet-form');
+    const submitButton = document.getElementById('submit-button');
+    const addButton = document.getElementById('add-button');
+    const messageDiv = document.getElementById('message');
+    let submitted = false; // Flag to track if form is submitted
+    let submittedName = '';
+    let submittedDOB = '';
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        submitButton.disabled = true; // Disable the submit button to prevent multiple submissions
+
+        // Check if any field is empty
+        const mobile = form.elements['Mobile'].value.trim();
+        const name = form.elements['Name'].value.trim();
+        const dob = form.elements['Date Of Birth'].value.trim();
+
+        if (mobile === '' || name === '' || dob === '') {
+            messageDiv.textContent = 'Error: All fields are required.';
+            submitButton.disabled = false; // Re-enable the submit button
+            return;
+        }
+
+        messageDiv.textContent = 'Submitting..., Please Wait Until Submission is Completed'; // Show submitting message
+
+        // Check if the combination of name and date of birth is the same as the previous submission
+        if (submitted && name === submittedName && dob === submittedDOB) {
+            messageDiv.textContent = 'Do Not Repeat';
+            submitButton.disabled = false; // Re-enable the submit button
+            return;
+        }
+
+        fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => {
+            messageDiv.textContent = 'Done, If you want to add more name then click Add'; // Show done message
+            submitButton.disabled = false; // Re-enable the submit button if needed
+            submitted = true; // Set the flag to true after first submission
+            submittedName = name; // Store the submitted name
+            submittedDOB = dob; // Store the submitted date of birth
+            addButton.style.display = 'inline-block'; // Show the Add button
+            form.elements['Mobile'].disabled = true; // Disable the Mobile field after submission
+        })
+        .catch(error => {
+            console.error('Error!!', error.message);
+            messageDiv.textContent = 'Error! Please try again.'; // Show error message
+            submitButton.disabled = false; // Re-enable the submit button if there was an error
+        });
+    });
+
+    addButton.addEventListener('click', () => {
+        // Reset only Name and Date of Birth fields
+        form.elements['Name'].value = '';
+        form.elements['Date Of Birth'].value = '';
+        addButton.style.display = 'none'; // Hide the Add button
+                messageDiv.textContent = '';
+
+    });
+</script>
+
+</body>
+</html>
