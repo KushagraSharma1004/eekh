@@ -1,69 +1,68 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    /* Global styles */
-    * {
-      box-sizing: border-box;
-    }
+  /* Global styles */
+  * {
+    box-sizing: border-box;
+  }
 
-    body {
-      font-family: Arial, sans-serif;
-      margin:  0;
-      padding: 0;
-      font-weight: bold;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
 
-    /* this is the container in which all things are their  */
+  /* Styles for form container */
+  .container {
+    width: 100%;
+    max-width: 400px; /* Set maximum width of the form container */
+    margin: auto;
+    padding: 20px;
+  }
+
+  /* Styles for form inputs */
+  input[type=text] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  /* Styles for submit button */
+  input[type=submit], button {
+    width: 100%;
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  input[type=submit]:hover, button:hover {
+    background-color: #45a049;
+  }
+
+  /* Styles for message div */
+  #message {
+    margin-top: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* Media query for smaller screens */
+  @media screen and (max-width: 600px) {
     .container {
-      width: 100%;
-      max-width: 400px; /* Set maximum width of the form container */
-      margin: auto;
-      padding: 20px;
+      padding: 10px;
     }
-
-    /* Styles for form inputs */
-    input[type=text] {
-      width: 100%;
-      padding: 12px 20px;
-      margin: 8px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-weight: bold;
-    }
-
-    /* Styles for submit button */
-    input[type=submit], button {
-      width: 100%;
-      background-color: #4CAF50;
-      color: white;
-      padding: 14px 20px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    input[type=submit]:hover, button:hover {
-      background-color: #45a049;
-      color: white;
-    }
-
-    /* Styles for message div */
-    #message {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-
-    }
-
-    /* Media query for smaller screens */
-    @media screen and (max-width: 600px) {
-      .container {
-        padding: 10px;
-      }
-    }
+  }
 </style>
+</head>
 <body>
 
 <h3>eekh.com</h3>
@@ -145,8 +144,7 @@
         form.elements['Name'].value = '';
         form.elements['Date Of Birth'].value = '';
         addButton.style.display = 'none'; // Hide the Add button
-                messageDiv.textContent = '';
-
+        messageDiv.textContent = '';
     });
 </script>
 
