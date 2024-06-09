@@ -21,16 +21,38 @@
     margin: auto;
     padding: 20px;
   }
-
+  
   /* Styles for form inputs */
-  input[type=text] {
+  input[type= date] {
     width: 100%;
+    input-security: auto;
     padding: 12px 20px;
     margin: 8px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
   }
+
+  input[type= number] {
+    width: 100%;
+    input-security: auto;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  input[type= text] {
+    width: 100%;
+    input-security: auto;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
 
   /* Styles for submit button */
   input[type=submit], button {
@@ -61,68 +83,85 @@
       padding: 10px;
     }
   }
+  
 </style>
 </head>
 <body>
 
-<h3>Thank you for contacting eekh</h3>
-
+         
+<h3><pre>    
+      Thank you for contacting eekh!
+       Please Fill the Below Feilds
+      You will get <big><big>*Rs.100 off*</big></big> 
+            </pre></h3>
 
 <div class="container">
     <form method="POST" name="google-sheet" id="google-sheet-form">
-        <label for="Mobile">Mobile</label>
-        <input type="text" id="lname" name="Mobile" placeholder="Your Mobile No.">
+        <label for="Mobile">Mobile</label>                                    
+        <input type="number" id="mobile" name="Mobile" placeholder="Your Mobile No.">
 
-        <label for="name"> Name</label>
-        <input type="text" id="fname" name="Name" placeholder="Name..">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="Name" placeholder="Name..">
+        
 
-        <label for="Date Of Birth">Date Of Birth</label>
-        <input type="text" id="dob" name="Date Of Birth" placeholder="Date Of Birth">
-
+        <label for="d.O.B">Date Of Birth</label>
+        <input type="date" id="d.O.B" name="D.O.B" placeholder="Date Of Birth">
+        
         <input type="submit" value="Submit" name="Submit" id="submit-button">
-        <button type="button" id="add-button">Add</button>
+        
+        <button type="button" id="add-button" style="display:none;">Add</button>
+
     </form>
 
     <div id="message"></div>
-
-    <!-- Add your image below the Add button -->
- <h3>1 pond Cake</h3>
+    <hr>
+    
+      <p><u><b>Our Servings</b></u></p>
+      
+      <hr>
+    <pre><b>1.  <a href ="http://127.0.0.1:5500/cake.html">Cake</a></b></pre>
+    <pre><b>2.  <a href ="http://127.0.0.1:5500/fun.html">Pizza</a></b></pre>
+    <pre><b>3.  <a href ="http://127.0.0.1:5500/index.html">Ice Cream</a></b></pre>
+    <pre><b>4.  <a href ="http://127.0.0.1:5500/index.html">Cold Coffee</a></b></pre>
+    
+  </div>
+    
+  <hr>
+    
+    <h2><pre>  Cake</pre></h2>
     <img src="cake1.jpeg" alt="image" style="width:49%; margin-top:5px;"> <img src="cake2.jpeg" alt="image" style="width:49%; margin-top:5px;">
     <img src="cake3.jpeg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake4.jpeg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake10.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake9.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake6.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake7.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake12.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake14.jpg" alt="image" style="width:49%; margin-top:2px;">
     
-<!--     <h3>2 pond Cake</h3>
     
-    <h3>3 pond Cake</h3> -->
-    
-    <h3>Layer Cake</h3>
+    <h2><pre>  Layer Cake</pre></h2>
     <img src="cake32.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake36.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake33.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake5.jpeg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake30.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake35.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake34.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake37.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake38.jpg" alt="image" style="width:49%; margin-top:2px;"> 
     
-    <h3>Anniversary Cake</h3>
+    <h2><pre>  Anniversary Cake</pre></h2>
   <img src="cake16.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake11.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake15.jpg" alt="image" style="width:49%; margin-top:2px;"> 
     
-    <h3>Girls Cake</h3>
-  <img src="cake31.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake17.jpg" alt="image" style="width:49%; margin-top:2px;">
+    <h2><pre>  Girls Cake</pre></h2>
+  <img src="cake31.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake42.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake18.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake19.jpg" alt="image" style="width:49%; margin-top:2px;">
     
-    <h3>Boys Cake</h3>
+    <h2><pre>  Boys Cake</pre></h2>
   <img src="cake39.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake29.jpg" alt="image" style="width:49%; margin-top:2px;">
   <img src="cake8.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake24.jpg" alt="image" style="width:49%; margin-top:2px;">
   <img src="cake41.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake40.jpg" alt="image" style="width:49%; margin-top:2px;"> 
    <img src="cake28.jpg" alt="image" style="width:49%; margin-top:2px;"> 
     
-    <h3>Photo Cake</h3>
+    <h2><pre>  Photo Cake</pre></h2>
   <img src="cake20.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake22.jpg" alt="image" style="width:49%; margin-top:2px;">
     <img src="cake21.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake23.jpg" alt="image" style="width:49%; margin-top:2px;">
 
-  </div>
+  
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxjzUZPHNc6bZAse6g3tyB3oruzOcutkIH9cANSlQAkHve6aA07rtfPb1kyNiBp0392Zg/exec';
@@ -133,15 +172,15 @@
     let submitted = false; // Flag to track if form is submitted
     let submittedName = '';
     let submittedDOB = '';
+    let submittedMobile = '';
 
     form.addEventListener('submit', e => {
         e.preventDefault();
+        
         submitButton.disabled = true; // Disable the submit button to prevent multiple submissions
-
-        // Check if any field is empty
         const mobile = form.elements['Mobile'].value.trim();
         const name = form.elements['Name'].value.trim();
-        const dob = form.elements['Date Of Birth'].value.trim();
+        const dob = form.elements['D.O.B'].value.trim();
 
         if (mobile === '' || name === '' || dob === '') {
             messageDiv.textContent = 'Error: All fields are required.';
@@ -178,9 +217,10 @@
     addButton.addEventListener('click', () => {
         // Reset only Name and Date of Birth fields
         form.elements['Name'].value = '';
-        form.elements['Date Of Birth'].value = '';
+        form.elements['D.O.B'].value = '';
         addButton.style.display = 'none'; // Hide the Add button
         messageDiv.textContent = '';
+      
     });
 </script>
 
