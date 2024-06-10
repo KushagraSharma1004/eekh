@@ -120,6 +120,28 @@
     text-align: center;
   }
 
+  .modal-contentsss {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    color:red;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+  }
+
+  .modal-contentssss {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    color:red;
+    width: 80%;
+    max-width: 600px;
+    text-align: center;
+  }
+
   .close {
     color: #aaa;
     float: right;
@@ -135,6 +157,20 @@
   }
 
   .closess {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .closesss {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .closessss {
     color: #aaa;
     float: right;
     font-size: 28px;
@@ -160,14 +196,14 @@
 <h3><pre>    
       Thank you for contacting eekh!
        Please Fill the Below Feilds
-      You will get <big><big>*Rs.100 off*</big></big> 
+      You will get <big><big><u>*Rs.100 off*</u></big></big> 
             </pre></h3>
 
 <div class="container">
     <form method="POST" name="google-sheet" id="google-sheet-form">
         <label for="Mobile">Mobile</label>                                    
         <input  type="number" id="mobile" name="Mobile" placeholder="Your Mobile No.">
-<!-- max = "10" maxlength="10" -->
+
         <label for="name">Name</label>
         <input type="text" id="name" name="Name" placeholder="Name..">
 
@@ -176,7 +212,7 @@
         
         <input type="submit" value="Submit" name="Submit" id="submit-button">
         
-        <button type="button" id="add-button" style="display:none;">Add</button>
+        <!-- <button type="button" id="add-button" style="display:none;">Add</button> -->
 
     </form>
 
@@ -256,18 +292,36 @@
   </div>
 </div>
 
+<div id="Input modal" class="modal">
+  <div class="modal-contentsss">
+    <span class="closesss" id="close-modalsss">&times;</span>
+    <p>Please Fill All Feilds </p>
+  </div>
+</div>
+
+<div id="Repeat modal" class="modal">
+  <div class="modal-contentssss">
+    <span class="closessss" id="close-modalssss">&times;</span>
+    <p>Please Do not Repeat</p>
+  </div>
+</div>
+
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzSgpx-MppubJ2c11gTYnKmd7WYF-9-TTlSP-w0Gt8VZpBlEd4Zd-K_w02vJDOufA29UA/exec';
     const form = document.getElementById('google-sheet-form');
     const submitButton = document.getElementById('submit-button');
-    const addButton = document.getElementById('add-button');
+    //const addButton = document.getElementById('add-button');
     const messageDiv = document.getElementById('message');
     const modal = document.getElementById('success-modal');
     const modals = document.getElementById('less 10 modal');
     const modalss = document.getElementById('greater 10 modal');
+    const modalsss = document.getElementById('Input modal');
+    const modalssss = document.getElementById('Repeat modal');
     const closeModal = document.getElementById('close-modal');
     const closeModals = document.getElementById('close-modals');
     const closeModalss = document.getElementById('close-modalss');
+    const closeModalsss = document.getElementById('close-modalsss');
+    const closeModalssss = document.getElementById('close-modalssss');
     let submitted = false; // Flag to track if form is submitted
     let submittedName = '';
     let submittedDOB = '';
@@ -296,23 +350,23 @@
 
 
         if (mobile === '' || name === '' || dob === '') {
-            messageDiv.textContent = 'Error: All fields are required.';
+            modalsss.style.display = 'block'; 
             submitButton.disabled = false; // Re-enable the submit button
             return;
         }
 
-        messageDiv.textContent = 'Submitting..., Please Wait Until Submission is Completed'; // Show submitting message
+        //messageDiv.textContent = 'Submitting..., Please Wait Until Submission is Completed'; // Show submitting message
 
         // Check if the combination of name and date of birth is the same as the previous submission
         if (submitted && name === submittedName && dob === submittedDOB) {
-            messageDiv.textContent = 'Do Not Repeat';
+            modalssss.style.display = 'block'; 
             submitButton.disabled = false; // Re-enable the submit button
             return;
         }
 
         fetch(scriptURL, { method: 'POST', body: new FormData(form)})
         .then(response => {
-            messageDiv.textContent ='Done, If you want to add more name then click Add'; // Show done message
+           // messageDiv.textContent ='Done, If you want to add more name then click Add'; // Show done message
             form.elements['Name'].value = '';
             form.elements['D.O.B'].value = '';
             modal.style.display = 'block'; // Show modal
@@ -320,25 +374,25 @@
             submitted = true; // Set the flag to true after first submission
             submittedName = name; // Store the submitted name
             submittedDOB = dob; // Store the submitted date of birth
-            addButton.style.display = 'inline-block'; // Show the Add button
+           // addButton.style.display = 'inline-block'; // Show the Add button
             form.elements['Mobile'].disabled = false; // Disable the Mobile field after submission
         })
         
         .catch(error => {
             console.error('Error!!', error.message);
-            messageDiv.textContent = 'Error! Please try again.'; // Show error message
+           // messageDiv.textContent = 'Error! Please try again.'; // Show error message
             submitButton.disabled = false; // Re-enable the submit button if there was an error
         });
     });
     
           
-    addButton.addEventListener('click', () => {
-        // Reset only Name and Date of Birth fields
-        form.elements['Name'].value = '';
-        form.elements['D.O.B'].value = '';
-        addButton.style.display = 'none'; // Hide the Add button
-        messageDiv.textContent = '';
-    });
+    // addButton.addEventListener('click', () => {
+    //     // Reset only Name and Date of Birth fields
+    //     form.elements['Name'].value = '';
+    //     form.elements['D.O.B'].value = '';
+    //     addButton.style.display = 'none'; // Hide the Add button
+    //     messageDiv.textContent = '';
+    // });
 
     closeModal.addEventListener('click', () => {
         modal.style.display = 'none';
@@ -350,6 +404,14 @@
 
     closeModalss.addEventListener('click', () => {
         modalss.style.display = 'none';
+    });
+
+    closeModalsss.addEventListener('click', () => {
+        modalsss.style.display = 'none';
+    });
+
+    closeModalssss.addEventListener('click', () => {
+        modalssss.style.display = 'none';
     });
 
 
@@ -368,6 +430,18 @@
     window.addEventListener('click', (event) => {
         if (event.target == modalss) {
             modalss.style.display = 'none';
+        }
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == modalsss) {
+            modalsss.style.display = 'none';
+        }
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == modalssss) {
+            modalssss.style.display = 'none';
         }
     });
     
