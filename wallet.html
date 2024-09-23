@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-image: url(cakeBackground.jpg);
+        }
+
+        .wallet-info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        }
+
+        .amount {
+            font-weight: bold;
+        }
+
+        .transaction-history {
+            margin-top: 20px;
+            margin-bottom: 70px;
+        }
+
+        .transaction {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .transaction p {
+            margin: 0;
+        }
+
+        #rightMenuBar {
+            visibility: hidden;
+            width: 250px;
+            height: 355px;
+            position: fixed;
+            right: 0px;
+            bottom: 70px;
+            z-index: 100;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            transform: translateY(100%);
+            /* Start off-screen */
+            transition: transform 0.5s ease;
+            /* I want that it should come from down to it actual position */
+            /* animation: rightMenuBarAnimation 0.5s ease-out forwards; */
+        }
+
+        #rightMenuBar.show {
+            transform: translateY(0);
+            animation: rightMenuBarAnimation 1s ease-in-out 1;
+
+            visibility: visible;
+            /* Move to its original position */
+        }
+
+
+        @keyframes rightMenuBarAnimation {
+
+            /* 10% {
+       opacity: 0.10;
+    } 50% {
+        opacity: 0.50;
+    } 80% {
+        opacity: 0.80;
+    } 100% {
+        opacity: 1;
+    } */
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="rightMenuBar">
+        <div style="margin-left: 20px;">
+            <span style="font-size: 20px; font-weight: 800; color: darkgreen;">eekh</span>
+            <img style="height: 20px; width: 20px; position: absolute; right: 10px; top: 10px;" src="crossImage.png"
+                alt="cross" onclick="closeMenu()">
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToIndex()">
+                <img style="height: 20px; width: 20px;" src="logoutImage.png" alt="logout">
+                <span style="margin-left: 10px;">Logout</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToWallet()">
+                <img onclick="goToWallet()" src="walletImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">Wallet</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyOrders()">
+                <img onclick="goToMyOrders()" src="myOrdersImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Orders</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToCart()">
+                <img onclick="goToCart()" src="cartImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Cart</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyReffered()">
+                <img onclick="goToMyReffered()" src="referralLogo.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Referrals</span>
+            </div>
+        </div>
+    </div>
+
+    <div
+        style="display: flex; background-color: white; height: 70px; align-content: center; position: fixed; bottom: 0px; width: 100%; justify-content: space-between; margin-left: -30px; ">
+        <img onclick="goToWallet()" src="walletImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <img onclick="goToMyOrders()" src="myOrdersImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <button
+            style="width:fit-content; background-color: transparent; padding: 0px; margin-top: -10px; border: 0px; border-radius: 0px; cursor:none;"
+            id="goToCartImage" onclick="goToCart()"><img src="cartImage.png" alt=""
+                style="height: 50px;width: 50;  margin-top: 10px; "></button>
+        <img style="height: 50px;width: 50;  margin-top: 10px;" class="topBarImg" src="menuImage.png" alt="sad"
+            onclick="openMenu()">
+
+
+    </div>
+
+    <img onclick="goToLogin()" src="backImage.jpg" alt=""
+        style="height: 50px;width: 50px;  margin-top: 10px; align-self: center;">
+    <div id="walletInfo" class="wallet-info"></div>
+    <div id="transactionHistory" class="transaction-history"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadWalletInfo() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const mobile = queryParams.get('mobile');
+
+            function goToCart() {
+                window.location.href = `Cart.html?mobile=${mobile}`;
+            }
+            function goToWallet() {
+                window.location.href = `wallet.html?mobile=${mobile}`;
+            }
+            function goToMyOrders() {
+                window.location.href = `myOrders.html?mobile=${mobile}`;
+            }
+            function goToIndex() {
+                window.location.href = `index.html?`;
+            }
+
+            //This function opens the right menu bar
+            function openMenu() {
+                //Get the right menu bar element
+                const rightMenuBar = document.getElementById('rightMenuBar');
+                // rightMenuBar.classList.toggle('show');
+
+                if (rightMenuBar.classList.contains('show')) {
+                    rightMenuBar.classList.remove('show');
+                    // setTimeout(() => rightMenuBar.style.visibility = 'hidden', 500); // Hide after transition
+                } else {
+                    rightMenuBar.style.visibility = 'visible'; // Make visible before sliding up
+                    rightMenuBar.classList.add('show');
+                }
+                //Set the visibility of the right menu bar to visible
+                // rightMenuBar.style.visibility = 'visible';
+
+
+                // if (rightMenuBar.style.visibility === 'hidden' || rightMenuBar.style.visibility === '') {
+                //     rightMenuBar.style.visibility = 'visible';
+                //     rightMenuBar.style.animation = 'rightMenuBarAnimation 0.5s ease-out forwards';
+                // } else {
+                //     rightMenuBar.style.visibility = 'hidden';
+                // }
+            }
+            function closeMenu() {
+                const rightMenuBar = document.getElementById('rightMenuBar');
+                rightMenuBar.style.visibility = 'hidden';
+            }
+
+            function goToMyReffered() {
+                window.location.href = `myReffered.html?mobile=${mobile}`;
+            }
+
+            window.goToCart = goToCart;
+            window.openMenu = openMenu;
+            window.closeMenu = closeMenu;
+            window.goToIndex = goToIndex;
+            window.goToMyOrders = goToMyOrders;
+            window.goToWallet = goToWallet;
+            window.goToMyReffered = goToMyReffered;
+
+
+
+            function goToLogin() {
+                window.location.href = `login.html?mobile=${mobile}`;
+            }
+            window.goToLogin = goToLogin;
+
+            if (!mobile) {
+                document.getElementById('walletInfo').innerHTML = '<p>No mobile number provided.</p>';
+                return;
+            }
+
+            try {
+                // Fetch user wallet information
+                const walletRef = doc(db, 'users', mobile);
+                const walletSnap = await getDoc(walletRef);
+
+                if (walletSnap.exists()) {
+                    const walletData = walletSnap.data();
+                    const referralAmount = walletData.referralAmount || 0;
+                    let transactions = walletData.walletHistory || [];
+
+                    // Sort transactions by date in descending order (latest first)
+                    transactions = transactions.sort((a, b) => b.date.seconds - a.date.seconds);
+                    // const formattedAmount = parseFloat(referralAmount).toFixed(2);
+                    // Display the referral amount
+                    const walletInfo = `
+                <p><strong>Referral Amount:</strong> ₹${parseFloat(referralAmount).toFixed(2)}</p>
+            `;
+                    document.getElementById('walletInfo').innerHTML = walletInfo;
+
+                    // Display the transaction history
+                    if (transactions.length > 0) {
+                        let historyHTML = '<h3>Transaction History</h3>';
+
+                        transactions.forEach(transaction => {
+                            const readableDate = transaction.date.toDate().toLocaleString(); // Convert timestamp to readable date
+                            const formattedAmount = parseFloat(transaction.amount).toFixed(2); // Format amount to 2 decimal places
+
+                            historyHTML += `
+        <div class="transaction">
+            <p><strong class="transactionType">${transaction.type}</strong></p>
+            <p><strong style="color: green" class='transactionType2'></strong> ₹${formattedAmount || "0.00"}</p>
+            <p><strong>Date:</strong> ${readableDate}</p>
+            <p><strong>Reason:</strong> ${transaction.reason || "N/A"}</p>
+            <p><strong style="color: green">Previous Balance:</strong> ₹${transaction.previousBalance || "0.00"}</p>
+        </div>
+        `;
+                        });
+
+                        document.getElementById('transactionHistory').innerHTML = historyHTML;
+
+                        // Apply styles based on transaction type
+                        const transactionTypes = document.querySelectorAll('.transactionType');
+                        const transactionTypes2 = document.querySelectorAll('.transactionType2');
+
+                        transactionTypes.forEach((element, index) => {
+                            if (element.textContent === "Addition") {
+                                element.style.color = "green";
+                                if (transactionTypes2[index]) {
+                                    transactionTypes2[index].textContent = 'Added Balance';
+
+                                }
+                            } else if (element.textContent === "Deduction") {
+                                element.style.color = "red";
+                                if (transactionTypes2[index]) {
+                                    transactionTypes2[index].textContent = 'Deducted Balance';
+                                    transactionTypes2[index].style.color = 'red';
+                                }
+                            }
+                        });
+                    } else {
+                        document.getElementById('transactionHistory').innerHTML = '<p>No transactions found.</p>';
+                    }
+
+                } else {
+                    document.getElementById('walletInfo').innerHTML = '<p>No wallet information found.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading wallet info: ", error);
+                document.getElementById('walletInfo').innerHTML = '<p>Error loading wallet information.</p>';
+            }
+        }
+
+        loadWalletInfo();
+
+        // Navigation functions
+
+    </script>
+</body>
+
+</html>

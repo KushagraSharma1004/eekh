@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('cakeBackground.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+            overflow: 'hidden';
+
+        }
+
+        .container {
+            animation: fadeIn 1.5s ease-in-out;
+            color: #333;
+
+            flex-direction: column;
+            display: flex;
+            width: 100%;
+            max-width: 400px;
+            /* Set maximum width of the form container */
+
+
+        }
+
+        .myOrdersDiv {
+
+            width: 99%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            justify-self: center;
+            align-self: center;
+            flex-direction: column;
+            background-color: 'blue';
+            position: absolute;
+            top: 1px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 1px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            animation: slideDown 1s ease-out;
+            margin-top: 0px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #ordersContainer {
+            padding-top: 0px;
+
+            width: 100%;
+            max-width: 360px;
+            /* background-blend-mode: color-burn;  */
+            /* background-color:transparent; */
+            background-color: hsla(0, 0%, 100%, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            flex-direction: row;
+            overflow-y: auto;
+            max-height: 90vh;
+            animation: growIn 1s ease-in-out;
+
+        }
+
+
+
+        @keyframes growIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .order-item {
+            display: flex;
+
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.5s ease-in-out both;
+            border-left: 5px solid #007bff;
+        }
+
+        /* .order-item:nth-child(odd) {
+            border-left-color: #28a745;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .order-item:nth-child(even) {
+            border-left-color: #ffc107;
+            background-color: rgba(240, 240, 240, 0.95);
+        } */
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .order-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-item {
+            flex-direction: column;
+            overflow: hidden;
+
+        }
+
+        .order-item img {
+            height: 60px;
+            width: 60px;
+
+            border-radius: 7px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+
+            from,
+            20%,
+            40%,
+            60%,
+            80%,
+            to {
+                animation-timing-function: ease-in-out;
+            }
+
+            from {
+                opacity: 0;
+                transform: scale3d(0.3, 0.3, 0.3);
+            }
+
+            20% {
+                transform: scale3d(1.1, 1.1, 1.1);
+            }
+
+            40% {
+                transform: scale3d(0.9, 0.9, 0.9);
+            }
+
+            60% {
+                opacity: 1;
+                transform: scale3d(1.03, 1.03, 1.03);
+            }
+
+            80% {
+                transform: scale3d(0.97, 0.97, 0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale3d(1, 1, 1);
+            }
+        }
+
+        .order-item div {
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+            animation: fadeInRight 0.6s ease-in-out;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .order-item span {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .order-item strong {
+            color: #007bff;
+            font-weight: 600;
+
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: right;
+            color: #999;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .back-button {
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+            height: 40px;
+            width: 40px;
+            background-color: black;
+            position: absolute;
+            z-index: 3;
+        }
+
+
+        .kushu {
+            flex-direction: column;
+            margin-top: 10px;
+        }
+
+        .nameQuantityPrice {
+            border-radius: 7px;
+            flex-direction: row;
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        .itemname span {
+            width: 121.2;
+        }
+
+
+        .itemname {
+            border-radius: 7px;
+            /* background-color: blue; */
+            align-items: center;
+            justify-content: center;
+            width: 121.2px;
+
+        }
+
+        .itemname strong {
+
+            color: rgb(230, 134, 134);
+
+        }
+
+        .itemquantity {
+            border-radius: 7px;
+            /* background-color: blueviolet; */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .itemprice {
+            border-radius: 7px;
+            /* background-color: #28a745; */
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .orderStatusInsideText {
+            /* background-color: red; */
+            height: 30px;
+            align-items: center;
+            border-radius: 7px;
+            font-size: 12px;
+        }
+
+        .orderStatusInsideText2 {
+            /* background-color: red; */
+            height: 30px;
+            align-items: center;
+            border-radius: 7px;
+        }
+
+        .orderTotalAmountInsideText2 {
+            /* background-color: royalblue; */
+            flex-direction: row;
+            align-items: center;
+            font-size: 17px;
+            border-radius: 7px;
+            color: darkgreen;
+
+        }
+
+        .orderTotalAmountInsideText {
+            /* background-color: white; */
+            flex-direction: row;
+            align-items: center;
+            border-radius: 7px;
+            font-size: 12px;
+        }
+
+        .itemPriceInsideText2 {
+            color: black;
+        }
+
+        .topRateBar {
+            height: 30px;
+            background-color: blue;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .order-timestamp {
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <img class="back-button" onclick="goToCart()" src="backImage.jpg" alt="Back">
+
+    <div class='container'>
+        <div class="myOrdersDiv">
+            <h1>My Orders</h1>
+
+            <div id="ordersContainer"></div>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        async function loadOrders() {
+            const ordersRef = collection(db, 'users', mobile, 'orders');
+            const querySnapshot = await getDocs(ordersRef);
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = '';
+
+            const sortedDocs = querySnapshot.docs.sort((a, b) => {
+                return a.data().timestamp.toDate() - b.data().timestamp.toDate();
+            });
+
+            sortedDocs.forEach(doc => {
+                const order = doc.data();
+                const orderElement = document.createElement('div');
+                orderElement.className = 'order-item';
+
+                // Get and format the timestamp
+                const orderDate = order.timestamp.toDate();
+                const formattedTime = orderDate.toLocaleString();
+
+                // Create a container for the timestamp
+                const timestampElement = document.createElement('div');
+                timestampElement.className = 'order-timestamp';
+                timestampElement.innerHTML = `<strong>Date:</strong><pre> </pre> ${formattedTime}<br>`;
+
+                // Append the timestamp to the order element
+                orderElement.appendChild(timestampElement);
+
+                order.order.forEach(item => {
+                    // Shorten the item name if it exceeds a certain length
+                    const maxLength = 15; // Define the max number of characters
+                    let itemName = item.itemName;
+
+                    // Function to truncate text at word or punctuation boundary
+                    function truncateText(text, maxLength) {
+                        if (text.length <= maxLength) return text;
+                        let truncated = text.slice(0, maxLength);
+                        const lastChar = truncated.slice(-1);
+                        if (lastChar !== ' ' && lastChar !== '-' && lastChar !== '.') {
+                            // Ensure truncation happens at a space or hyphen if possible
+                            const lastSpaceIndex = truncated.lastIndexOf(' ');
+                            const lastHyphenIndex = truncated.lastIndexOf('-');
+                            const truncationIndex = Math.max(lastSpaceIndex, lastHyphenIndex);
+                            truncated = text.slice(0, truncationIndex > 0 ? truncationIndex : maxLength);
+                        }
+                        return truncated + ' ..';
+                    }
+
+                    itemName = truncateText(itemName, maxLength);
+
+                    const itemElement = document.createElement('div');
+                    itemElement.innerHTML = `
+            <div style='flex-direction:row'>
+                <div class='kushu'>
+                    <img src="${item.itemImage}" alt="${itemName}">
+                    <div class="nameQuantityPrice">
+                        <div class='itemname'><span><strong>${itemName}</strong></span></div>
+                        <div class='itemquantity'><span>${item.quantity}</span></div>
+                        <div class='itemprice'><span><div class='itemPriceInsideText2'>Rs. ${item.itemPrice}</span></div></div>
+                    </div>
+                </div>
+            </div>
+            `;
+                    orderElement.appendChild(itemElement);
+                });
+
+                orderElement.innerHTML += `
+        <div class="status">
+            <div class='orderStatusText'>
+                <div class='orderStatusInsideText'><strong>Status:</strong></div> 
+                <div class='orderStatusInsideText2'>${order.status}<br></div>
+            </div>
+            <div class='orderTotalAmountText'>
+                <div class='orderTotalAmountInsideText'><strong>Total Amount:</strong></div> 
+                <div class='orderTotalAmountInsideText2'>Rs. ${order.totalAmount}</div>
+            </div>
+        </div>`;
+
+                ordersContainer.appendChild(orderElement);
+                const statusValueElement = orderElement.querySelector('.orderStatusInsideText2');
+                if (statusValueElement.textContent.includes('Approved')) {
+                    statusValueElement.style.color = 'lightgreen';
+                    orderElement.style.borderLeftColor = 'lightgreen';
+                } else if (statusValueElement.textContent.includes('Pending')) {
+                    statusValueElement.style.color = 'rgb(255, 255, 13)';
+                    orderElement.style.borderLeftColor = 'rgb(255, 255, 13)';
+                } else {
+                    statusValueElement.style.color = 'red';
+                    orderElement.style.borderLeftColor = 'red';
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+        function goToCart() {
+            window.location.href = 'Cart.html?mobile=' + mobile;
+        }
+        window.goToCart = goToCart;
+        loadOrders();
+    </script>
+</body>
+
+</html>

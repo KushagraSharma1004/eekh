@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referred Numbers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .referred-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .referred-item {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            width: calc(50% - 20px);
+            /* Adjust the width as needed */
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 600px) {
+            .referred-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My Referrals</h1>
+    <div id="referred-container" class="referred-container"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadReferredNumbers() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mobileNumber = urlParams.get('mobile');
+
+            if (!mobileNumber) {
+                alert('Mobile number not provided in the URL.');
+                return;
+            }
+
+            try {
+                const referredDocRef = doc(db, 'myReferred', mobileNumber);
+                const referredDoc = await getDoc(referredDocRef);
+
+                if (referredDoc.exists()) {
+                    const referredData = referredDoc.data();
+                    const referredNumbers = referredData.referredNumbers || [];
+
+                    const referredContainer = document.getElementById('referred-container');
+                    referredContainer.innerHTML = ''; // Clear previous content
+                    let i = referredNumbers.length; // Start i from the total number of items
+
+                    referredNumbers.slice().reverse().forEach(({ mobile, name }) => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'referred-item';
+
+                        itemElement.textContent = `${i} : ${name}`; // Use i for numbering in descending order
+                        i--; // Decrease i in each iteration
+
+                        referredContainer.appendChild(itemElement);
+                    });
+
+                } else {
+                    alert('No referred numbers found for this mobile number.');
+                }
+            } catch (error) {
+                console.error('Error fetching referred numbers:', error);
+                alert('Error fetching referred numbers. Please try again.');
+            }
+        }
+
+        window.onload = loadReferredNumbers;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <style>
+        body {
+            background: url(cakeBackground.jpg);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .cart-container {
+            max-width: 100%;
+            margin: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-bottom: 80px;
+        }
+
+        .cart-item {
+            display: flex;
+            flex-direction: row;
+
+
+            border-bottom: 1px solid #ddd;
+
+        }
+
+        .cart-item img {
+            height: 100px;
+            width: 100px;
+            border-radius: 8px;
+            margin-left: 5px;
+            /* background-color: red; */
+            margin-top: 10px;
+        }
+
+        .cart-item .details {
+            margin-left: 10px;
+            padding: 10px;
+            flex: 1;
+            text-align: center;
+            /* background-color: blue; */
+        }
+
+        .cart-item .details span {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            /* background-color: gray; */
+        }
+
+        .cart-item .quantity-controls {
+            display: flex;
+            height: 30px;
+
+            position: absolute;
+            right: 0px;
+            bottom: 10px;
+
+            /* background-color: aqua; */
+
+        }
+
+        .cart-item .quantity-controls .quantityControlButtonAdd {
+            background-color: green;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            border-radius: 7px;
+            color: white;
+        }
+
+        .cart-item .quantity-controls .quantityControlButtonSub {
+            background-color: red;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            border-radius: 7px;
+            color: white;
+        }
+
+        .cart-item .quantity-controls .remove {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+
+
+        }
+
+        .cart-item .quantity-controls button.remove {
+            background-color: #dc3545;
+        }
+
+        .cart-item .quantity-controls button.remove:hover {
+            background-color: #c82333;
+        }
+
+
+        .cart-item input {
+
+            height: 27px;
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        #totalAmountContainer {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #confirmButton {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #shopMoreButton {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #confirmButton:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            margin-top: 10px;
+            margin-left: 20px;
+            cursor: pointer;
+            position: fixed;
+            z-index: 2;
+            display: block;
+            height: 40px;
+            width: 40px;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            /* transition: transform 0.3s ease; */
+        }
+
+        .back-button img {
+            height: 40px;
+            width: 40px;
+        }
+
+        #rightMenuBar {
+            visibility: hidden;
+            width: 250px;
+            height: 355px;
+            position: fixed;
+            right: 0px;
+            bottom: 70px;
+            z-index: 100;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            transform: translateY(100%);
+            /* Start off-screen */
+            transition: transform 0.5s ease;
+            /* I want that it should come from down to it actual position */
+            /* animation: rightMenuBarAnimation 0.5s ease-out forwards; */
+        }
+
+        #rightMenuBar.show {
+            transform: translateY(0);
+            animation: rightMenuBarAnimation 1s ease-in-out 1;
+
+            visibility: visible;
+            /* Move to its original position */
+        }
+
+
+        @keyframes rightMenuBarAnimation {
+
+            /* 10% {
+       opacity: 0.10;
+    } 50% {
+        opacity: 0.50;
+    } 80% {
+        opacity: 0.80;
+    } 100% {
+        opacity: 1;
+    } */
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="rightMenuBar">
+        <div style="margin-left: 20px;">
+            <span style="font-size: 20px; font-weight: 800; color: darkgreen;">eekh</span>
+            <img style="height: 20px; width: 20px; position: absolute; right: 10px; top: 10px;" src="crossImage.png"
+                alt="cross" onclick="closeMenu()">
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToIndex()">
+                <img style="height: 20px; width: 20px;" src="logoutImage.png" alt="logout">
+                <span style="margin-left: 10px;">Logout</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToWallet()">
+                <img onclick="goToWallet()" src="walletImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">Wallet</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyOrders()">
+                <img onclick="goToMyOrders()" src="myOrdersImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Orders</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToCart()">
+                <img onclick="goToCart()" src="cartImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Cart</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyReffered()">
+                <img onclick="goToMyReffered()" src="referralLogo.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Referrals</span>
+            </div>
+        </div>
+    </div>
+
+    <div
+        style="display: flex; background-color: white; height: 70px; align-content: center; position: fixed; bottom: 0px; width: 100%; justify-content: space-between; z-index: 999;">
+        <img onclick="goToWallet()" src="walletImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <img onclick="goToMyOrders()" src="myOrdersImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <button
+            style="width:fit-content; background-color: transparent; padding: 0px; margin-top: -10px; border: 0px; border-radius: 0px; cursor:none;"
+            id="goToCartImage" onclick="goToCart()"><img src="cartImage.png" alt=""
+                style="height: 50px;width: 50;  margin-top: 10px; "></button>
+        <img style="height: 50px;width: 50;  margin-top: 10px;" class="topBarImg" src="menuImage.png" alt="sad"
+            onclick="openMenu()">
+
+    </div>
+    <button class="back-button" onclick="goToMenu()">
+
+        <img src="backImage.jpg" alt="Back"> <!-- Replace with your actual back button image file name -->
+
+
+    </button>
+    <div class="cart-container">
+
+        <div id="cartItemsContainer"></div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+            <div id="appliedCouponDiv" style=" color: darkgreen;">
+
+            </div>
+            <div id="removeDiscountButton"
+                style="width: 80px; height: 35px; border-radius: 7px; background-color: red; display: flex; align-items: center; justify-content: center; cursor: pointer; display: none;">
+                <p style="margin: 0; font-size: 16px; color: white;">Remove</p>
+            </div>
+        </div>
+        <div class="discountcouponDiv"
+            style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+
+            <select style="height: 40px; width: 200px; font-size: 18px; margin-right: 10px; border-radius: 7px;"
+                id="couponInput" placeholder="coupon Code">
+
+                <option value="Select Coupon" id="selectCoupon">Select Coupon</option>
+                <option style="display: none;" value="WALLET0FF50%" id="walletOff50%">WALLET0FF50%</option>
+                <option style="display: none;" value="FLAT100OFF" id="flat100Off">FLAT100OFF</option>
+                <option value="100%WALLETCASHBACK" id="100%WalletCashback">100%WALLETCASHBACK
+                </option>
+
+            </select>
+            <div id="discountButton"
+                style="width: 80px; height: 35px; border-radius: 7px; background-color: green; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <p style="margin: 0; font-size: 16px; color: white;">APPLY</p>
+            </div>
+
+
+
+
+        </div>
+        <div id="totalAmountContainer"></div> <!-- Total amount section -->
+        <button id="confirmButton" onclick="confirmOrder()">Confirm Order</button>
+        <button id="shopMoreButton" onclick="goToMenu()">Shop More!!</button>
+    </div>
+
+
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, updateDoc, deleteDoc, writeBatch, setDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        async function loadCartItems() {
+            const cartRef = collection(db, 'users', mobile, 'cart');
+            const querySnapshot = await getDocs(cartRef);
+            const cartItemsContainer = document.getElementById('cartItemsContainer');
+            cartItemsContainer.innerHTML = '';
+
+            let totalAmount = 0;
+            let hasCakeOrPizza = false; // Flag to check if there's any Cake or Pizza
+            let hasNonCakeOrPizza = false; // Flag to check if there's any item not Cake or Pizza
+
+            querySnapshot.forEach(doc => {
+                const item = doc.data();
+                totalAmount += item.itemPrice * item.quantity;
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+            <div style="width:100%;">
+                <div style="width:100%;" >
+                    <div style="position: relative; width:100%; display:flex; align-items: center" >
+                        <img style=' margin-bottom: 10px; ' src="${item.itemImage}" alt="${item.itemName}">
+                        <div class="details" style='height: 80px; align-self: center; text-align:top'>
+                            <span>${item.itemName}</span>
+                            <span>Rs. ${item.itemPrice}</span>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantityControlButtonSub" onclick="changeQuantity('${doc.id}', -1)">-</button>
+                            <input type="number" value="${item.quantity}" min="1" readonly>
+                            <button class="quantityControlButtonAdd" onclick="changeQuantity('${doc.id}', 1)">+</button>
+                            <button class="remove" onclick="removeItem('${doc.id}')">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                cartItemsContainer.appendChild(itemElement);
+
+                // Check if there's any Cake or Pizza in the cart
+                if (item.category === 'Cake' || item.category === 'Pizza') {
+                    hasCakeOrPizza = true;
+                }
+
+                // Check if there's any item that is not Cake or Pizza
+                if (item.category !== 'Cake' && item.category !== 'Pizza') {
+                    hasNonCakeOrPizza = true;
+                }
+            });
+
+            // Update the total amount in the UI
+
+
+            // Apply coupon display logic based on item categories
+            updateCouponDisplay(hasCakeOrPizza, hasNonCakeOrPizza);
+
+
+            function updateCouponDisplay(hasCakeOrPizza, hasNonCakeOrPizza) {
+                let walletOff50 = document.getElementById('walletOff50%');
+                let flat100Off = document.getElementById('flat100Off');
+
+                // Show or hide FLAT100OFF based on the presence of Cake or Pizza
+                if (hasCakeOrPizza) {
+                    flat100Off.style.display = 'block';
+                } else {
+                    flat100Off.style.display = 'none';
+                }
+
+                // Show or hide WALLETOFF50 based on the presence of any non-Cake or non-Pizza items
+                if (hasNonCakeOrPizza) {
+                    walletOff50.style.display = 'none';
+                } else {
+                    walletOff50.style.display = 'block';
+                }
+            }
+
+
+            // Display total amount
+            document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount}`;
+
+            // Handle coupon functionality
+            const discountButton = document.getElementById('discountButton');
+            const removeDiscountButton = document.getElementById('removeDiscountButton');
+            const appliedCouponDiv = document.getElementById('appliedCouponDiv');
+            const couponInputDiv = document.getElementById('couponInput');
+
+            // Ensure previous event listeners are removed
+            discountButton.removeEventListener('click', applyCoupon);
+            removeDiscountButton.removeEventListener('click', removeCoupon);
+
+
+
+            const removeTotalAmount = totalAmount;
+
+
+
+
+            // Add the apply coupon functionality
+
+            async function applyCoupon() {
+                const couponInput = couponInputDiv.value;
+                appliedCouponDiv.innerHTML = ''; // Clear any previous content
+
+                let discount = 0;
+
+                // Coupon validation and discount calculation
+                if (couponInput === "FLAT100OFF") {
+                    discount = 100;
+                } else if (couponInput === "FLAT101OFF") {
+                    discount = 101;
+                } else if (couponInput === "FLAT102OFF") {
+                    discount = 102;
+                } else if (couponInput === "WALLETOFF50%") {
+                    try {
+                        // Fetch user wallet information
+                        const walletRef = doc(db, 'users', mobile);
+                        const walletSnap = await getDoc(walletRef); // Use await to get the document snapshot
+
+                        if (walletSnap.exists()) { // Check if the document exists
+                            const walletData = walletSnap.data(); // Access the data using .data()
+
+                            let totalAmountHalf = totalAmount / 2;
+                            let walletAmount = walletData.referralAmount || 0;
+
+                            if (walletAmount > totalAmountHalf) {
+                                totalAmount = totalAmountHalf;
+
+                                walletAmount -= totalAmountHalf; // Deduct the used amount from the wallet
+                                //         await updateDoc(walletRef, {
+                                //             referralAmount: walletAmount
+                                //         });
+                            } else if (walletAmount <= totalAmountHalf) {
+                                totalAmount -= walletAmount; // Deduct the entire wallet amount from the total
+                                walletAmount = 0; // Wallet is now empty
+                                //  await updateDoc(walletRef, {
+                                //      referralAmount: walletAmount
+                                //  });
+                            }
+                        } else {
+                            // Handle the case where the wallet document does not exist
+                        }
+
+                    } catch (error) {
+                        console.error("Error loading wallet info: ", error);
+                        // document.getElementById('walletInfo').innerHTML = '<p>Error loading wallet information.</p>';
+                    }
+                } else if (couponInput === "100%WALLETCASHBACK*") {
+
+                }
+
+
+
+                totalAmount -= discount;
+                document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount} `;
+
+                // Display applied coupon and remove button
+                const appliedCouponText = document.createElement('span');
+                appliedCouponText.textContent = `Coupon Applied: ${couponInput}`;
+
+                appliedCouponDiv.appendChild(appliedCouponText);
+
+                // Toggle buttons and hide the coupon input
+                discountButton.style.display = 'none';
+                removeDiscountButton.style.display = 'flex';
+                couponInputDiv.style.display = 'none';
+            }
+
+            // Add the remove coupon functionality
+            async function removeCoupon() {
+                const couponInput = couponInputDiv.value;
+                let discount = 0;
+
+                // Coupon validation and discount calculation
+                if (couponInput === "FLAT100OFF") {
+                    // discount = 100;
+                    location.reload();
+                } else if (couponInput === "FLAT101OFF") {
+                    // discount = 101;
+                    location.reload();
+                } else if (couponInput === "FLAT102OFF") {
+                    // discount = 102;
+                    location.reload();
+                } else if (couponInput === "WALLETOFF50%") {
+
+                    try {
+
+                        const walletRef = doc(db, 'users', mobile);
+                        const walletSnap = await getDoc(walletRef);
+
+                        const walletData = walletSnap.data();
+                        console.log('removeTotalAmount: ', removeTotalAmount);
+                        console.log('totalAmount: ', totalAmount);
+                        const amountUsedFromWallet = removeTotalAmount - totalAmount;
+
+                        // await updateDoc(walletRef, {
+                        //     referralAmount: walletData.referralAmount + amountUsedFromWallet
+                        // });
+
+                        console.log('referralAmount', walletData.referralAmount);
+
+                    } catch (error) {
+                        console.error("Error loading wallet info: ", error);
+                    }
+                    location.reload();
+
+                } else if (couponInput === "100%WALLETCASHBACK*") {
+
+                }
+
+
+
+
+
+                document.getElementById('totalAmountContainer').innerText = `Total Amount: Rs. ${totalAmount}`;
+                appliedCouponDiv.innerHTML = ''; // Clear coupon display
+
+                // Toggle buttons and show the coupon input
+                discountButton.style.display = 'flex';
+                removeDiscountButton.style.display = 'none';
+                couponInputDiv.style.display = 'inline';
+            }
+
+            discountButton.addEventListener('click', applyCoupon);
+            removeDiscountButton.addEventListener('click', removeCoupon);
+
+            // Set the total amount on the confirm button
+            const confirmButton = document.getElementById('confirmButton');
+            confirmButton.setAttribute('data-total', totalAmount);
+
+
+            if (totalAmount === 0) {
+                document.getElementById('discountButton').style.display = 'none';
+                couponInputDiv.style.display = 'none';
+                document.getElementById('appliedCouponDiv').innerHTML = '';
+                cartItemsContainer.innerHTML = '<p style="color: red; font-size: 20px; margin-top: 20px; margin-left:30% ; ">Cart is empty</p>';
+                document.getElementById('confirmButton').style.display = 'none';
+                document.getElementById("shopMoreButton").style.display = 'block';
+            }
+            async function confirmOrder() {
+
+
+                if (couponInputDiv.value === "WALLETOFF50%") {
+
+                    const walletRef = doc(db, 'users', mobile);
+                    const walletSnap = await getDoc(walletRef); // Use await to get the document snapshot
+
+                    if (walletSnap.exists()) { // Check if the document exists
+                        const walletData = walletSnap.data(); // Access the data using .data()
+
+                        let totalAmountHalf = removeTotalAmount / 2;
+                        let walletAmount = walletData.referralAmount || 0;
+
+                        if (walletAmount > totalAmountHalf) {
+                            // totalAmount = totalAmountHalf;
+                            walletAmount -= totalAmountHalf; // Deduct the used amount from the wallet
+                            await updateDoc(walletRef, {
+                                referralAmount: walletAmount
+                            });
+                        } else if (walletAmount <= totalAmountHalf) {
+                            // totalAmount -= walletAmount; // Deduct the entire wallet amount from the total
+                            walletAmount = 0; // Wallet is now empty
+                            await updateDoc(walletRef, {
+                                referralAmount: walletAmount
+                            });
+                        }
+                    } else {
+                        // Handle the case where the wallet document does not exist
+                    }
+                }
+
+                document.getElementById('confirmButton').disabled = 'true';
+                document.querySelector('.back-button').disabled = true;
+
+                try {
+                    if (!totalAmount || totalAmount <= 0) {
+                        alert('Error: No items in cart.');
+                        return;
+                    }
+
+                    const cartRef = collection(db, 'users', mobile, 'cart');
+                    const querySnapshot = await getDocs(cartRef);
+                    const orderItems = [];
+
+                    querySnapshot.forEach(doc => {
+                        const item = doc.data();
+                        orderItems.push(item);
+                    });
+
+                    const ordersRef = collection(db, 'users', mobile, 'orders');
+                    const discount = removeTotalAmount - totalAmount;
+                    let couponInput = couponInputDiv.value
+                    if (couponInput === "Select Coupon") {
+                        couponInput = 'No coupon selected'
+                    }
+                    // Add order to the orders collection
+                    await addDoc(ordersRef, {
+                        order: orderItems,
+                        totalAmount: totalAmount,
+                        status: 'Pending',
+                        timestamp: new Date(),
+                        userMobileNumber: mobile,
+                        couponApplied: couponInput || "No coupon selected"
+                    });
+
+                    const batch = writeBatch(db);
+                    querySnapshot.forEach(doc => {
+                        const itemRef = doc.ref;
+                        batch.delete(itemRef);
+                    });
+                    await batch.commit();
+
+                    // Fetch the user's wallet information
+                    const userRef = doc(db, 'users', mobile);
+                    const userDoc = await getDoc(userRef);
+
+                    if (couponInput === 'WALLETOFF50%') {
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            const currentReferralAmount = userData.referralAmount || 0;
+
+                            // Deduct the totalAmount from referralAmount
+                            const updatedReferralAmount = currentReferralAmount - totalAmount;
+                            console.log(updatedReferralAmount);
+
+                            // Prepare the wallet transaction details
+                            const walletHistory = userData.walletHistory || [];
+                            walletHistory.push({
+                                type: 'Deduction',
+                                amount: totalAmount,
+                                date: new Date(),
+                                reason: 'WALLETOFF50%',
+                                previousBalance: currentReferralAmount + totalAmount
+                            });
+
+                            // Update the referralAmount and walletHistory in Firestore
+                            await setDoc(userRef, {
+                                // referralAmount: updatedReferralAmount,
+                                walletHistory: walletHistory
+                            }, { merge: true });
+                        }
+                    }
+
+                    console.log('Order confirmed:', totalAmount);
+                    window.location.href = 'myOrders.html?mobile=' + mobile;
+
+                } catch (error) {
+                    console.error('Error confirming order:', error.message);
+                    alert('There was an issue confirming your order. Please try again.');
+                }
+
+
+            }
+
+
+
+
+
+            async function changeQuantity(itemId, change) {
+                document.querySelector('.back-button').disabled = true;
+                document.querySelector('#confirmButton').disabled = true;
+
+                try {
+                    const itemRef = doc(db, 'users', mobile, 'cart', itemId);
+                    const itemSnap = await getDoc(itemRef);
+
+                    if (itemSnap.exists()) {
+                        const itemData = itemSnap.data();
+                        const currentQuantity = itemData.quantity;
+                        const newQuantity = Math.max(parseInt(currentQuantity) + change, 0); // Ensure quantity doesn't go below 0
+
+                        if (newQuantity > 0) {
+                            await updateDoc(itemRef, { quantity: newQuantity });
+                            console.log('Quantity changed for item:', itemId, 'New quantity:', newQuantity);
+                        } else {
+                            await removeItem(itemId); // Remove item if the quantity is 0 or less
+                            console.log('Item removed due to quantity reaching zero:', itemId);
+                        }
+
+                        // Update the referral amount in the wallet
+                        try {
+                            const walletRef = doc(db, 'users', mobile);
+                            const walletSnap = await getDoc(walletRef);
+
+                            if (walletSnap.exists()) {
+                                const walletData = walletSnap.data();
+                                const amountUsedFromWallet = removeTotalAmount - totalAmount;
+
+                                await updateDoc(walletRef, {
+                                    referralAmount: walletData.referralAmount + amountUsedFromWallet
+                                });
+
+                                console.log('Updated referral amount:', walletData.referralAmount + amountUsedFromWallet);
+                            } else {
+                                console.error('Wallet data not found.');
+                            }
+                        } catch (error) {
+                            console.error("Error updating wallet info:", error);
+                        }
+
+                        loadCartItems(); // Refresh cart items
+                    } else {
+                        console.error('Item not found in cart:', itemId);
+                    }
+                } catch (error) {
+                    console.error('Error changing quantity:', error.message);
+                    alert('There was an issue updating the quantity. Please try again.');
+                } finally {
+                    location.reload(); // Refresh the page to reflect changes
+                }
+            }
+
+            async function removeItem(itemId) {
+                document.querySelector('.back-button').disabled = true;
+                document.querySelector('#confirmButton').disabled = true;
+
+                try {
+                    const itemRef = doc(db, 'users', mobile, 'cart', itemId);
+                    await deleteDoc(itemRef);
+                    loadCartItems();
+                    console.log('Item removed:', itemId);
+                } catch (error) {
+                    console.error('Error removing item:', error.message);
+                    alert('There was an issue removing the item. Please try again.');
+                }
+                try {
+
+                    const walletRef = doc(db, 'users', mobile);
+                    const walletSnap = await getDoc(walletRef);
+
+                    const walletData = walletSnap.data();
+                    console.log('removeTotalAmount: ', removeTotalAmount);
+                    console.log('totalAmount: ', totalAmount);
+                    const amountUsedFromWallet = removeTotalAmount - totalAmount;
+
+                    await updateDoc(walletRef, {
+                        referralAmount: walletData.referralAmount + amountUsedFromWallet
+                    });
+
+                    console.log('referralAmount', walletData.referralAmount);
+
+                } catch (error) {
+                    console.error("Error loading wallet info: ", error);
+                }
+                location.reload();
+            }
+            window.removeItem = removeItem;
+            window.changeQuantity = changeQuantity;
+            window.confirmOrder = confirmOrder;
+        }
+
+
+
+
+
+
+
+
+
+        function goToMenu() {
+            window.location.href = 'login.html?mobile=' + mobile;
+        }
+
+        function goToCart() {
+            window.location.href = `Cart.html?mobile=${mobile}`;
+        }
+        function goToWallet() {
+            window.location.href = `wallet.html?mobile=${mobile}`;
+        }
+        function goToMyOrders() {
+            window.location.href = `myOrders.html?mobile=${mobile}`;
+        }
+        function goToIndex() {
+            window.location.href = `index.html?`;
+        }
+
+        //This function opens the right menu bar
+        function openMenu() {
+            //Get the right menu bar element
+            const rightMenuBar = document.getElementById('rightMenuBar');
+            // rightMenuBar.classList.toggle('show');
+
+            if (rightMenuBar.classList.contains('show')) {
+                rightMenuBar.classList.remove('show');
+                // setTimeout(() => rightMenuBar.style.visibility = 'hidden', 500); // Hide after transition
+            } else {
+                rightMenuBar.style.visibility = 'visible'; // Make visible before sliding up
+                rightMenuBar.classList.add('show');
+            }
+            //Set the visibility of the right menu bar to visible
+            // rightMenuBar.style.visibility = 'visible';
+
+
+            // if (rightMenuBar.style.visibility === 'hidden' || rightMenuBar.style.visibility === '') {
+            //     rightMenuBar.style.visibility = 'visible';
+            //     rightMenuBar.style.animation = 'rightMenuBarAnimation 0.5s ease-out forwards';
+            // } else {
+            //     rightMenuBar.style.visibility = 'hidden';
+            // }
+        }
+        function closeMenu() {
+            const rightMenuBar = document.getElementById('rightMenuBar');
+            rightMenuBar.style.visibility = 'hidden';
+        }
+
+        function goToMyReffered() {
+            window.location.href = `myReffered.html?mobile=${mobile}`;
+        }
+
+        window.onload = loadCartItems;
+
+
+        window.goToCart = goToCart;
+        window.openMenu = openMenu;
+        window.closeMenu = closeMenu;
+        window.goToIndex = goToIndex;
+        window.goToMyOrders = goToMyOrders;
+        window.goToWallet = goToWallet;
+        window.goToMyReffered = goToMyReffered;
+        window.goToMenu = goToMenu;
+
+    </script>
+</body>
+
+</html>

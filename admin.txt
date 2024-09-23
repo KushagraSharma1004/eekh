@@ -1,0 +1,2274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, purple, green);
+        }
+        legend {
+            padding: 0 10px;
+            background-color: white;
+            color: #333;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        input[type=date], input[type=number], input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            color: darkgreen;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+        input[type=submit], button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .data-item {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: linear-gradient(45deg, lightgreen, lightblue);
+            font-size: 14px;
+        }
+        .record-item, .cart-item, .order-item {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #f9f9f9;
+            background: linear-gradient(-45deg, lightgreen, lightblue);
+        }
+        #dataContainer, #cartContainer, #ordersContainer {
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            input[type=submit], button {
+                font-size: 14px;
+                padding: 12px;
+            }
+            .data-item {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Panel</h1>
+        <fieldset>
+            <legend>Mobile Number</legend>
+            <input type="text" id="mobileNumber" required placeholder="Please Enter Mobile Number" maxlength="10"/>  
+        </fieldset>
+        <button onclick="fetchData()">Fetch Data</button>
+        <div id="dataContainer"></div>
+        <div id="cartContainer"></div>
+        <div id="ordersContainer"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, deleteDoc, addDoc } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.fetchData = async function() {
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            const dataContainer = document.getElementById('dataContainer');
+            const cartContainer = document.getElementById('cartContainer');
+            const ordersContainer = document.getElementById('ordersContainer');
+            dataContainer.innerHTML = ''; // Clear previous data
+            cartContainer.innerHTML = ''; // Clear previous cart data
+            ordersContainer.innerHTML = ''; // Clear previous orders data
+
+            if (mobileNumber) {
+                try {
+                    const docRef = doc(db, 'users', mobileNumber);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const dataItem = document.createElement('div');
+                        dataItem.classList.add('data-item');
+                        
+                        // Display top-level fields
+                        dataItem.innerHTML = `<strong>Name:</strong> ${data.name}<br>
+                                              <strong>Referral Phone Number:</strong> ${data.referralPhoneNumber}<br>
+                                              <strong>Password:</strong> ${data.password}`;
+
+                        // Fetch and display nested records if they exist
+                        const recordsRef = collection(docRef, 'records');
+                        const recordsSnapshot = await getDocs(recordsRef);
+                        if (!recordsSnapshot.empty) {
+                            const recordsContainer = document.createElement('div');
+                            recordsContainer.innerHTML = '<strong>Records:</strong>';
+                            recordsSnapshot.forEach((recordDoc) => {
+                                const recordData = recordDoc.data();
+                                const recordItem = document.createElement('div');
+                                recordItem.classList.add('record-item');
+                                recordItem.innerHTML = `<strong>Name:</strong> ${recordData.name}<br>
+                                                        <strong>Date of Birth:</strong> ${recordData.dob}`;
+                                recordsContainer.appendChild(recordItem);
+                            });
+                            dataItem.appendChild(recordsContainer);
+                        } else {
+                            dataItem.innerHTML += '<p>No records found</p>';
+                        }
+
+                        dataContainer.appendChild(dataItem);
+
+                        // Fetch and display cart items if they exist
+                        const cartRef = collection(docRef, 'cart'); // Ensure 'cart' is the correct path
+                        const cartSnapshot = await getDocs(cartRef);
+                        if (!cartSnapshot.empty) {
+                            const cartContainerTitle = document.createElement('h2');
+                            cartContainerTitle.textContent = "Cart";
+                            cartContainer.appendChild(cartContainerTitle);
+
+                            cartSnapshot.forEach((cartDoc) => {
+                                const cartData = cartDoc.data();
+                                
+                                const cartItem = document.createElement('div');
+                                cartItem.classList.add('cart-item');
+                                cartItem.innerHTML = `<strong>Item:</strong> ${cartData.itemName}<br>
+                                                      <strong>Quantity:</strong> ${cartData.quantity}<br>
+                                                      <strong>Price:</strong> ₹${cartData.itemPrice}`;
+                                cartContainer.appendChild(cartItem);
+                            });
+                        } else {
+                            cartContainer.innerHTML = '<p>No cart items found</p>';
+                        }
+
+                        // Fetch and display order details if they exist
+                        const ordersRef = collection(docRef, 'orders');
+                        const ordersSnapshot = await getDocs(ordersRef);
+                        if (!ordersSnapshot.empty) {
+                            const ordersContainerTitle = document.createElement('h2');
+                            ordersContainerTitle.textContent = "Orders";
+                            ordersContainer.appendChild(ordersContainerTitle);
+
+                            ordersSnapshot.forEach((orderDoc) => {
+                                const orderData = orderDoc.data();
+
+                                orderData.order.forEach((item, index) => {
+                                    const orderItem = document.createElement('div');
+                                    orderItem.classList.add('order-item');
+                                    orderItem.innerHTML = `<strong>Order ${index + 1}:</strong><br>
+                                                           <img src="${item.itemImage}" alt="${item.itemName}" width="50"><br>
+                                                           <strong>Name:</strong> ${item.itemName}<br>
+                                                           <strong>Quantity:</strong> ${item.quantity}<br>
+                                                           <strong>Price:</strong> ₹${item.itemPrice}`;
+                                    ordersContainer.appendChild(orderItem);
+                                });
+
+                                // Add approve/reject/edit buttons for each order
+                                const orderActions = document.createElement('div');
+                                orderActions.classList.add('order-actions');
+
+                                const approveButton = document.createElement('button');
+                                approveButton.textContent = 'Approve';
+                                approveButton.onclick = () => handleOrderApproval(orderDoc.id, orderData);
+                                orderActions.appendChild(approveButton);
+
+                                const rejectButton = document.createElement('button');
+                                rejectButton.textContent = 'Reject';
+                                rejectButton.onclick = () => handleOrderRejection(orderDoc.id, orderData);
+                                orderActions.appendChild(rejectButton);
+
+                                const editButton = document.createElement('button');
+                                editButton.textContent = 'Edit';
+                                editButton.onclick = () => handleOrderEdit(orderDoc.id, orderData);
+                                orderActions.appendChild(editButton);
+
+                                if (orderData.status === 'Approved') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                if (orderData.status === 'Rejected') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                ordersContainer.appendChild(orderActions);
+                            });
+                        } else {
+                            ordersContainer.innerHTML = '<p>No orders found</p>';
+                        }
+                    } else {
+                        dataContainer.innerHTML = '<p>No data found for this mobile number</p>';
+                    }
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            }
+        }
+
+        async function handleOrderApproval(orderId, orderData) {
+    console.log("Approved order with ID:", orderId);
+
+    // Calculate the total amount and referral amount (10% of the total amount)
+    const totalAmount = orderData.order.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+    const referralAmount = totalAmount * 0.05;
+
+    // Get the user document to fetch the referral phone number
+    const userDocRef = doc(db, 'users', orderData.userMobileNumber);
+    
+    try {
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const referralNumber = userData.referralPhoneNumber;
+
+            if (referralNumber) {
+                // Reference to the referral user's document
+                const referralDocRef = doc(db, 'users', referralNumber);
+                const referralDocSnap = await getDoc(referralDocRef);
+
+                if (referralDocSnap.exists()) {
+                    // Referral number exists, update its wallet
+                    console.log(`Referral number found: ${referralNumber}`);
+
+                    // Update or create the 'referralAmount' field in the referral user's document
+                    const referralData = referralDocSnap.data();
+                    const currentReferralAmount = referralData.referralAmount || 0;
+                    const updatedReferralAmount = currentReferralAmount + referralAmount;
+
+                    await updateDoc(referralDocRef, {
+                        referralAmount: updatedReferralAmount
+                    });
+
+                    console.log(`Referral amount ₹${referralAmount} added to the referral wallet of ${referralNumber}`);
+                } else {
+                    console.log(`Referral number ${referralNumber} does not exist.`);
+                    // Optionally, you could create a new document for the referral number if needed
+                }
+            } else {
+                console.log("No referral number available in user data.");
+            }
+        } else {
+            console.log("User document does not exist.");
+        }
+    } catch (error) {
+        console.error("Error fetching or updating referral amount:", error);
+    }
+
+    // Update the status of the order to 'Approved'
+    try {
+        const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+        await updateDoc(orderDocRef, { status: 'Approved' });
+
+        console.log("Order status updated to 'Approved'");
+    } catch (error) {
+        console.error("Error updating order status:", error);
+    }
+
+    // Refresh data after approval
+    await window.fetchData();
+}
+
+        
+        async function handleOrderRejection(orderId, orderData) {
+            console.log("Rejected order with ID:", orderId);
+
+            // Check if userMobileNumber is present in orderData
+            const userMobileNumber = orderData.userMobileNumber;
+            if (userMobileNumber) {
+                try {
+                    // Reference to the specific order document
+                    const orderDocRef = doc(db, 'users', userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { status: 'Rejected' });
+                    
+                    console.log("Order status updated to 'Rejected'");
+                } catch (error) {
+                    console.error("Error updating order status:", error);
+                }
+            } else {
+                console.log("Mobile number is missing in orderData:", orderData);
+            }
+
+            // Refresh data after Rejection
+            await window.fetchData();
+        }
+
+
+        async function handleOrderEdit(orderId, orderData) {
+            const newQuantity = prompt('Enter new quantity for the item:', '1');
+            if (newQuantity) {
+                try {
+                    // Assuming that orderData.order is an array of items
+                    const updatedOrder = { ...orderData };
+                    updatedOrder.order[0].quantity = newQuantity; // Update quantity of the first item for demonstration
+                    
+                    // Reference to the specific order document
+                    const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { order: updatedOrder.order });
+                    
+                    console.log("Order updated with ID:", orderId);
+                    await window.fetchData(); // Refresh data after editing
+                } catch (error) {
+                    console.error("Error updating order:", error);
+                }
+            }
+        }
+
+        window.handleOrderRejection = handleOrderRejection;
+        window.handleOrderApproval = handleOrderApproval;
+        window.handleOrderEdit = handleOrderEdit;
+        
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, purple, green);
+        }
+
+        legend {
+            padding: 0 10px;
+            background-color: white;
+            color: #333;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        input[type=date],
+        input[type=number],
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            color: darkgreen;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        input[type=submit],
+        button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .data-item {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: linear-gradient(45deg, lightgreen, lightblue);
+            font-size: 14px;
+        }
+
+        .record-item,
+        .cart-item,
+        .order-item {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #ffffff;
+
+            /* background: linear-gradient(-45deg, lightgreen, lightblue); */
+        }
+
+        #dataContainer,
+        #cartContainer,
+        #ordersContainer {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input[type=submit],
+            button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .data-item {
+                font-size: 12px;
+            }
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: space-between;
+            justify-content: space-evenly;
+        }
+
+        #ordersContainer button {
+            width: calc(90% / 3);
+
+            align-self: stretch;
+        }
+
+        #adminPanelContainer button {
+            width: calc(90% / 3);
+
+            align-self: stretch;
+        }
+
+        .order-actions button {
+            width: calc(90% / 2);
+
+            align-self: stretch;
+        }
+
+        .order-details {
+            background-color: black;
+            color: #ffffff;
+            border-radius: 7px;
+            padding: 10px;
+        }
+
+        #OrderItemDiv {
+            display: flex;
+            flex-direction: column;
+            height: 45px;
+            position: relative;
+        }
+
+        #OrderItemImageQuantityPrice {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        #OrderItemName {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        #OrderItemImageQuantityPrice .OrderItemImageOriginal {
+            height: 45px;
+            width: 45px;
+            border-radius: 7px;
+        }
+
+
+        #OrderItemDiv button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: red;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pending-order-item {
+            margin-top: 15px;
+        }
+
+        .confirm {
+            height: 150px;
+            width: 250px;
+            background-color: white;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .confirmButton {
+            width: 100px;
+        }
+
+        .container {
+            display: none;
+        }
+
+        #passwordDiv {
+            max-width: 250px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div id="passwordDiv">
+        <div id="passwordPrompt">
+            <input id="passwordInput" placeholder="Please Enter The Password" type="text" style="outline: none; ">
+            <button id="passwordButton">OK</button>
+            <button id="resetPasswordButton">Reset Password</button>
+        </div>
+        <div id="resetPasswordDiv" style="display:none;">
+            <input id="resetPasswordInput" type="text" placeholder="Old Password">
+
+            <input id="newPasswordInput" type="text" placeholder="New Password">
+            <button id="ok2">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Set initial password if it doesn't exist in localStorage
+        let password = localStorage.getItem("password") || "1234";  // Default password is "1234"
+
+        const passwordInput = document.getElementById("passwordInput");
+        const passwordButton = document.getElementById("passwordButton");
+        const resetPasswordButton = document.getElementById("resetPasswordButton");
+        const resetPasswordInput = document.getElementById("resetPasswordInput");
+        const newPasswordInput = document.getElementById("newPasswordInput");
+        const resetPasswordDiv = document.getElementById("resetPasswordDiv");
+        const passwordPrompt = document.getElementById("passwordPrompt");
+        // const ok1 = document.getElementById("ok1");
+        const ok2 = document.getElementById("ok2");
+
+        passwordButton.addEventListener("click", function () {
+            if (passwordInput.value === password) {
+                document.getElementById("passwordDiv").style.display = "none";
+                document.querySelector(".container").style.display = "block";
+            } else {
+                alert("Incorrect Password!");
+            }
+        });
+
+        resetPasswordButton.addEventListener("click", function () {
+            passwordPrompt.style.display = "none";
+
+            resetPasswordDiv.style.display = "block";
+        });
+
+
+
+        ok2.addEventListener("click", function () {
+            if (resetPasswordInput.value === password) {
+                if (newPasswordInput.value) {
+                    password = newPasswordInput.value;
+                    localStorage.setItem("password", password);  // Save the new password in localStorage
+                    alert("Password successfully changed!");
+                    location.reload();  // Reload the page
+                } else {
+                    alert("New password cannot be empty!");
+                }
+            } else {
+                alert("Incorrect Old Password!");
+            }
+        });
+    </script>
+
+
+
+    <div class="container">
+
+
+        <h1>Admin Panel</h1>
+        <fieldset>
+            <legend>Mobile Number</legend>
+            <input type="number" id="mobileNumber" required placeholder="Please Enter Mobile Number" maxlength="10" />
+        </fieldset>
+        <div class="order-actions">
+            <button id="fetchDataButton" onclick="fetchData()">Fetch Data</button>
+            <button id="goInsideButton" onclick="goInside()"> Go Inside </button>
+        </div>
+        <a href="addItem.html"><button id="addItemButton">Add New Item</button></a>
+        <button id="loadOrdersButton" onclick="loadPendingOrders()">All Recent Orders</button>
+
+
+        <div id="adminPanelContainer"></div>
+        <div id="dataContainer"></div>
+        <div id="cartContainer"></div>
+        <div id="ordersContainer"></div>
+
+        <div class="confirm">
+            <img style="position: absolute; top: 10px; right: 10px; height: 10px; width:10px;" src="crossImage.png"
+                alt="" onclick="closeConfirm()">
+            <h1>Are You sure?</h1>
+            <button class="confirmButton"><span>Confirm</span></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, deleteDoc, addDoc } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function closeConfirm() {
+            document.querySelector('.confirm').style.display = 'none';
+        }
+        window.closeConfirm = closeConfirm;
+
+        async function loadPendingOrders() {
+            const fetchDataButton = document.getElementById('fetchDataButton');
+            // fetchDataButton.disabled = true; // Disable the button while processing
+            fetchDataButton.style.backgroundColor = 'grey'
+            const goInsideButton = document.getElementById('goInsideButton');
+            // goInsideButton.disabled = true;
+            goInsideButton.style.backgroundColor = 'grey'
+            const addItemButton = document.getElementById('addItemButton');
+            // addItemButton.disabled = true;
+            addItemButton.style.backgroundColor = 'grey'
+            const loadOrdersButton = document.getElementById('loadOrdersButton');
+            // loadOrdersButton.disabled = true;
+            loadOrdersButton.style.backgroundColor = 'green' // Disable the button immediately after the first click
+
+            const button = document.getElementById('loadOrdersButton');
+            button.disabled = true;
+
+            document.getElementById("adminPanelContainer").innerHTML = '';
+            document.getElementById("dataContainer").innerHTML = '';
+            document.getElementById("cartContainer").innerHTML = '';
+            document.getElementById("ordersContainer").innerHTML = ''; // Clear previous data
+
+            const adminPanelContainer = document.getElementById('adminPanelContainer');
+            adminPanelContainer.innerHTML = ''; // Clear previous data
+
+            try {
+                // Get all user documents
+                const usersRef = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersRef);
+
+                // Get all pending orders across users
+                const allPendingOrders = [];
+
+                // Create an array of promises to fetch pending orders for each user
+                const userPromises = usersSnapshot.docs.map(async (userDoc) => {
+                    const mobileNumber = userDoc.id; // Assuming document ID is the mobile number
+                    const ordersRef = collection(db, 'users', mobileNumber, 'orders');
+                    const ordersSnapshot = await getDocs(ordersRef);
+
+                    ordersSnapshot.docs.forEach(orderDoc => {
+                        const orderData = orderDoc.data();
+                        if (orderData.status === 'Pending') {
+                            allPendingOrders.push({ ...orderData, orderId: orderDoc.id, userMobileNumber: mobileNumber });
+                        }
+                    });
+                });
+
+                // Wait for all user promises to resolve
+                await Promise.all(userPromises);
+
+                // Sort orders by timestamp in descending order
+                allPendingOrders.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+
+                // Display all pending orders
+                allPendingOrders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'pending-order-item';
+
+                    // Get and format the timestamp
+                    const orderDate = order.timestamp.toDate();
+                    const formattedTime = orderDate.toLocaleString();
+
+                    // Create a container for the timestamp
+                    const timestampElement = document.createElement('div');
+                    timestampElement.className = 'order-timestamp';
+                    timestampElement.innerHTML = `<strong>Time:</strong> ${formattedTime}<br>`;
+
+                    // Create a container for order details
+                    const orderDetailsElement = document.createElement('div');
+                    orderDetailsElement.className = 'order-details';
+                    orderDetailsElement.innerHTML = `
+                <div class="user-mobile-number"><strong>Mobile Number:</strong> ${order.userMobileNumber}</div>
+                <div class="order-status"><strong>Status:</strong> ${order.status}</div>
+                <div class="order-total-amount"><strong>Total Amount:</strong> ₹${order.totalAmount}</div>
+                <div class="order-id"><strong>Order ID:</strong> ${order.orderId}</div>
+                
+            `;
+
+                    // Append timestamp and details to the order element
+
+
+
+                    // Display items in the order
+                    order.order.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'order-item';
+                        itemElement.innerHTML = `
+                    <div id="OrderItemDiv">
+                        <div id="OrderItemImageQuantityPrice">
+                            <div id="OrderItemImage">
+                                <img class="OrderItemImageOriginal" src="${item.itemImage}" alt="${item.itemName}" width="50"><br>
+                            </div>
+                            <div id="OrderItemQuantity">
+                                <strong>Quantity:</strong> ${item.quantity}<br>
+                            </div>
+                            <div id="OrderItemPrice">
+                                <strong>Price:</strong> ₹${item.itemPrice}<br>
+                            </div>
+                        </div>
+                        <div id="OrderItemName">
+                            <strong>Name:</strong> ${item.itemName}<br>
+                        </div>
+                    </div>
+                `;
+                        orderElement.appendChild(itemElement);
+                    });
+
+                    // Add approve/reject/edit buttons for each pending order
+                    const orderActions = document.createElement('div');
+                    orderActions.className = 'order-actions';
+
+                    const approveButton = document.createElement('button');
+
+                    approveButton.textContent = 'Approve';
+                    // approveButton.onclick = () => handleOrderApproval(order.orderId, order) && loadPendingOrders();
+                    approveButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = '#4CAF50'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Approve</span>`
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderApproval(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+
+                        }
+                    };
+                    orderActions.appendChild(approveButton);
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = 'Reject';
+                    rejectButton.style.backgroundColor = 'red';
+                    rejectButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        // document.querySelector('.confirmButton').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = 'red'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Reject</span>`
+
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderRejection(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+                        }
+
+                    };
+
+                    // rejectButton.onclick = () => handleOrderRejection(order.orderId, order) && loadPendingOrders();
+                    // rejectButton.onclick = () => loadPendingOrders();
+                    orderActions.appendChild(rejectButton);
+
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.style.backgroundColor = 'yellow';
+
+                    editButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = 'yellow'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Edit</span>`
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderEdit(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+                        }
+                    };
+
+                    // editButton.onclick = () => loadPendingOrders();
+                    orderActions.appendChild(editButton);
+
+                    orderElement.appendChild(orderActions);
+                    orderElement.appendChild(orderDetailsElement);
+                    orderDetailsElement.appendChild(timestampElement);
+                    adminPanelContainer.appendChild(orderElement);
+                });
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            } finally {
+                button.disabled = false; // Re-enable the button after processing
+            }
+        }
+
+
+
+
+        window.loadPendingOrders = loadPendingOrders;
+
+
+
+        window.fetchData = async function () {
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            if (mobileNumber === "") {
+                alert("Please enter mobile number");
+                return;
+            }
+            document.getElementById("adminPanelContainer").innerHTML = '';
+            document.getElementById("dataContainer").innerHTML = '';
+            document.getElementById("cartContainer").innerHTML = '';
+            document.getElementById("ordersContainer").innerHTML = ''; // Clear previous data
+            const dataContainer = document.getElementById('dataContainer');
+            const cartContainer = document.getElementById('cartContainer');
+            const ordersContainer = document.getElementById('ordersContainer');
+            dataContainer.innerHTML = ''; // Clear previous data
+            cartContainer.innerHTML = ''; // Clear previous cart data
+            ordersContainer.innerHTML = ''; // Clear previous orders data
+            const fetchDataButton = document.getElementById('fetchDataButton');
+            // fetchDataButton.disabled = true; // Disable the button while processing
+            fetchDataButton.style.backgroundColor = 'green'
+            const goInsideButton = document.getElementById('goInsideButton');
+            // goInsideButton.disabled = true;
+            goInsideButton.style.backgroundColor = 'grey'
+            const addItemButton = document.getElementById('addItemButton');
+            // addItemButton.disabled = true;
+            addItemButton.style.backgroundColor = 'grey'
+            const loadOrdersButton = document.getElementById('loadOrdersButton');
+            // loadOrdersButton.disabled = true;
+            loadOrdersButton.style.backgroundColor = 'grey'
+
+
+
+            if (mobileNumber) {
+                try {
+                    const docRef = doc(db, 'users', mobileNumber);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const dataItem = document.createElement('div');
+                        dataItem.classList.add('data-item');
+
+                        // Display top-level fields
+                        dataItem.innerHTML = `<strong>Name:</strong> ${data.name}<br>
+                                              <strong>Password:</strong> ${data.password}<br>
+                                              
+                                              <strong>Wallet Amount:</strong> ₹${data.referralAmount}<br>
+                                              <strong>Referral Phone Number:</strong> ${data.referralPhoneNumber}`;
+
+
+                        // Fetch and display nested records if they exist
+                        const recordsRef = collection(docRef, 'records');
+                        const recordsSnapshot = await getDocs(recordsRef);
+                        if (!recordsSnapshot.empty) {
+                            const recordsContainer = document.createElement('div');
+                            recordsContainer.innerHTML = '<strong>My Family Members:</strong>';
+                            recordsSnapshot.forEach((recordDoc) => {
+                                const recordData = recordDoc.data();
+                                const recordItem = document.createElement('div');
+                                recordItem.classList.add('record-item');
+                                recordItem.innerHTML = `<strong>Name:</strong> ${recordData.name}<br>
+                                                        <strong>Date of Birth:</strong> ${recordData.dob}`;
+                                recordsContainer.appendChild(recordItem);
+                            });
+                            dataItem.appendChild(recordsContainer);
+                        } else {
+                            dataItem.innerHTML += '<p>No records found</p>';
+                        }
+
+                        dataContainer.appendChild(dataItem);
+
+                        // Fetch and display cart items if they exist
+                        const cartRef = collection(docRef, 'cart'); // Ensure 'cart' is the correct path
+                        const cartSnapshot = await getDocs(cartRef);
+                        if (!cartSnapshot.empty) {
+                            const cartContainerTitle = document.createElement('h2');
+                            cartContainerTitle.textContent = "Cart";
+                            cartContainer.appendChild(cartContainerTitle);
+
+                            cartSnapshot.forEach((cartDoc) => {
+                                const cartData = cartDoc.data();
+
+                                const cartItem = document.createElement('div');
+                                cartItem.classList.add('cart-item');
+                                cartItem.innerHTML = `<strong>Item:</strong> ${cartData.itemName}<br>
+                                                      <strong>Quantity:</strong> ${cartData.quantity}<br>
+                                                      <strong>Price:</strong> ₹${cartData.itemPrice}<br>
+                                                      
+                                                      `;
+                                cartContainer.appendChild(cartItem);
+                            });
+                        } else {
+                            cartContainer.innerHTML = '<p>No cart items found</p>';
+                        }
+
+                        // Fetch and display order details if they exist
+                        const ordersRef = collection(docRef, 'orders');
+                        const ordersSnapshot = await getDocs(ordersRef);
+                        if (!ordersSnapshot.empty) {
+                            const ordersContainerTitle = document.createElement('h2');
+                            ordersContainerTitle.textContent = "Orders";
+                            ordersContainer.appendChild(ordersContainerTitle);
+
+                            // Convert the ordersSnapshot to an array and sort by timestamp
+                            const sortedOrders = ordersSnapshot.docs.sort((a, b) => {
+                                return b.data().timestamp.toDate() - a.data().timestamp.toDate();
+                            });
+
+                            sortedOrders.forEach((orderDoc) => {
+                                const orderData = orderDoc.data();
+                                const orderId = orderDoc.id;
+
+                                orderData.order.forEach((item, index) => {
+                                    // Create a container for each item in the order
+                                    const orderItem = document.createElement('div');
+                                    orderItem.classList.add('order-item');
+
+                                    // Add the item details to the container
+                                    orderItem.innerHTML = `
+                <div id="OrderItemDiv">
+                    <div id="OrderItemImageQuantityPrice">
+                        <div id="OrderItemImage">
+                            <img class="OrderItemImageOriginal" src="${item.itemImage}" alt="${item.itemName}" width="50"><br>
+                        </div>
+                        <div id="OrderItemQuantity">
+                            <strong>Quantity:</strong> ${item.quantity}<br>
+                        </div>
+                        <div id="OrderItemPrice">
+                            <strong>Price:</strong> ₹${item.itemPrice}<br>
+                        </div>
+                    </div>
+                    <div id="OrderItemName">
+                        <strong>Name:</strong> ${item.itemName}<br>
+                    </div>
+                </div>
+            `;
+
+                                    // Append the item container to the main orders container
+                                    ordersContainer.appendChild(orderItem);
+                                });
+
+                                const orderItemId = document.createElement('div');
+                                orderItemId.classList.add('order-item-id');
+                                orderItemId.innerHTML = `<strong>Order Id: ${orderId}</strong><br>`;
+
+                                const orderDate = orderData.timestamp.toDate();
+                                const formattedTime = orderDate.toLocaleString();
+                                const orderItemTime = document.createElement('div');
+                                orderItemTime.classList.add('order-item-time');
+                                orderItemTime.innerHTML = `<strong>Time: ${formattedTime}</strong><br>`;
+
+
+
+
+                                // After listing all items, add a separate div for the order-level details
+                                const orderDetails = document.createElement('div');
+                                orderDetails.classList.add('order-details');
+
+
+                                orderDetails.innerHTML = `
+            <strong>Status:</strong> ${orderData.status}<br>
+            <strong>Total Amount:</strong> ₹${orderData.totalAmount}<br>
+`;
+                                orderDetails.appendChild(orderItemId);
+                                orderDetails.appendChild(orderItemTime);
+                                // Append the order details container to the main orders container
+                                ordersContainer.appendChild(orderDetails);
+
+
+
+                                // Add approve/reject/edit buttons for each order
+                                const orderActions = document.createElement('div');
+                                orderActions.classList.add('order-actions');
+
+                                const approveButton = document.createElement('button');
+                                approveButton.textContent = 'Approve';
+
+                                approveButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = '#4CAF50'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Approve</span>`
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderApproval(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+
+                                    }
+                                };
+                                orderActions.appendChild(approveButton);
+
+                                const rejectButton = document.createElement('button');
+                                rejectButton.textContent = 'Reject';
+                                rejectButton.style.backgroundColor = 'red';
+                                rejectButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    // document.querySelector('.confirmButton').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = 'red'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Reject</span>`
+
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderRejection(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+                                    }
+
+                                };
+                                orderActions.appendChild(rejectButton);
+
+                                const editButton = document.createElement('button');
+                                editButton.textContent = 'Edit';
+                                editButton.style.backgroundColor = 'yellow';
+                                editButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = 'yellow'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Edit</span>`
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderEdit(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+                                    }
+                                };
+                                orderActions.appendChild(editButton);
+
+                                if (orderData.status === 'Approved') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                if (orderData.status === 'Rejected') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                ordersContainer.appendChild(orderActions);
+                            });
+                        } else {
+                            ordersContainer.innerHTML = '<p>No orders found</p>';
+                        }
+                    } else {
+                        dataContainer.innerHTML = '<p>No data found for this mobile number</p>';
+                    }
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            }
+        }
+
+        async function handleOrderApproval(orderId, orderData) {
+            console.log("Approved order with ID:", orderId);
+
+            // Calculate the total amount and referral amount (10% of the total amount)
+            const totalAmount = orderData.totalAmount;
+            console.log(totalAmount);
+            const referralAmount = totalAmount * 0.05;
+
+            // Get the user document to fetch the referral phone number
+            const userDocRef = doc(db, 'users', orderData.userMobileNumber);
+
+            try {
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    const referralNumber = userData.referralPhoneNumber;
+
+                    if (referralNumber) {
+                        // Reference to the referral user's document
+                        const referralDocRef = doc(db, 'users', referralNumber);
+                        const referralDocSnap = await getDoc(referralDocRef);
+
+                        if (referralDocSnap.exists()) {
+                            // Referral number exists, update its wallet
+                            console.log(`Referral number found: ${referralNumber}`);
+
+                            // Update or create the 'referralAmount' field in the referral user's document
+                            const referralData = referralDocSnap.data();
+                            const currentReferralAmount = referralData.referralAmount || 0;
+                            const updatedReferralAmount = currentReferralAmount + referralAmount;
+
+                            await updateDoc(referralDocRef, {
+                                referralAmount: updatedReferralAmount
+                            });
+
+                            console.log(`Referral amount ₹${referralAmount} added to the referral wallet of ${referralNumber}`);
+                        } else {
+                            console.log(`Referral number ${referralNumber} does not exist.`);
+                            // Optionally, you could create a new document for the referral number if needed
+                        }
+                    } else {
+                        console.log("No referral number available in user data.");
+                    }
+                } else {
+                    console.log("User document does not exist.");
+                }
+            } catch (error) {
+                console.error("Error fetching or updating referral amount:", error);
+            }
+
+            // Update the status of the order to 'Approved'
+            try {
+                const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                await updateDoc(orderDocRef, { status: 'Approved' });
+
+                console.log("Order status updated to 'Approved'");
+            } catch (error) {
+                console.error("Error updating order status:", error);
+            }
+
+            // Refresh data after approval
+            location.reload();
+        }
+
+
+        async function handleOrderRejection(orderId, orderData, mobileNumber, removeTotalAmount) {
+            console.log("Rejected order with ID:", orderId);
+
+            const userMobileNumber = orderData.userMobileNumber;
+            if (userMobileNumber) {
+                // Calculate the total amount and the referral amount (if applicable)
+                const totalAmount = orderData.order.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+                const totalAmountOriginal = orderData.totalAmount;
+                const referralAmount = totalAmount - totalAmountOriginal; // Assuming this is the correct way to calculate it
+
+                try {
+                    // Get the current referral amount from the database
+                    const walletRef = doc(db, 'users', userMobileNumber);
+                    const walletSnapshot = await getDoc(walletRef);
+                    const currentReferralAmount = walletSnapshot.exists() ? walletSnapshot.data().referralAmount || 0 : 0;
+
+                    // Add the referral amount to the current referral amount
+                    const updatedReferralAmount = currentReferralAmount + referralAmount;
+
+                    // Update the referral amount in the database
+                    await updateDoc(walletRef, {
+                        referralAmount: updatedReferralAmount
+                    });
+
+                    console.log("Referral amount updated by ₹" + referralAmount);
+
+                    // Update the order status to 'Rejected'
+                    const orderDocRef = doc(db, 'users', userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { status: 'Rejected' });
+
+                    console.log("Order status updated to 'Rejected'");
+                } catch (error) {
+                    console.error("Error updating order status or referral amount:", error);
+                }
+            } else {
+                console.log("Mobile number is missing in orderData:", orderData);
+            }
+
+            // Refresh data after Rejection
+            location.reload();
+        }
+
+
+
+        async function handleOrderEdit(orderId, orderData) {
+            const newQuantity = prompt('Enter new quantity for the item:', '1');
+            if (newQuantity) {
+                try {
+                    // Assuming that orderData.order is an array of items
+                    const updatedOrder = { ...orderData };
+                    updatedOrder.order[0].quantity = newQuantity; // Update quantity of the first item for demonstration
+
+                    // Reference to the specific order document
+                    const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { order: updatedOrder.order });
+
+                    console.log("Order updated with ID:", orderId);
+                    location.reload(); // Refresh data after editing
+                } catch (error) {
+                    console.error("Error updating order:", error);
+                }
+            }
+        }
+
+        async function goInside() {
+            const goInsideNumber = document.getElementById('mobileNumber').value.trim();
+            if (goInsideNumber === "") {
+                alert("Please Enter Number First");
+                return;
+            }
+            if (goInsideNumber.length !== 10) {
+                alert("Please Enter a Valid 10-Digit Mobile Number");
+                return;
+            }
+
+            try {
+                // Query Firestore to check if the mobile number exists
+                const docRef = doc(db, "users", goInsideNumber);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    // Mobile number found in the database, proceed with redirection
+                    window.location.href = "login.html?mobile=" + goInsideNumber;
+                } else {
+                    // Mobile number not found in the database
+                    alert("Mobile Number not found in the database. Please enter a registered mobile number.");
+                }
+            } catch (error) {
+                console.error("Error checking mobile number: ", error);
+                alert("An error occurred while checking the mobile number. Please try again later.");
+            }
+        }
+        window.goInside = goInside;
+        window.handleOrderRejection = handleOrderRejection;
+        window.handleOrderApproval = handleOrderApproval;
+        window.handleOrderEdit = handleOrderEdit;
+
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        fieldset {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, purple, green);
+        }
+
+        legend {
+            padding: 0 10px;
+            background-color: white;
+            color: #333;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        input[type=date],
+        input[type=number],
+        input[type=text],
+        input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            color: darkgreen;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        input[type=submit],
+        button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .data-item {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: linear-gradient(45deg, lightgreen, lightblue);
+            font-size: 14px;
+        }
+
+        .record-item,
+        .cart-item,
+        .order-item {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background-color: #ffffff;
+
+            /* background: linear-gradient(-45deg, lightgreen, lightblue); */
+        }
+
+        #dataContainer,
+        #cartContainer,
+        #ordersContainer {
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            input[type=submit],
+            button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .data-item {
+                font-size: 12px;
+            }
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: space-between;
+            justify-content: space-evenly;
+        }
+
+        #ordersContainer button {
+            width: calc(90% / 3);
+
+            align-self: stretch;
+        }
+
+        #adminPanelContainer button {
+            width: calc(90% / 3);
+
+            align-self: stretch;
+        }
+
+        .order-actions button {
+            width: calc(90% / 2);
+
+            align-self: stretch;
+        }
+
+        .order-details {
+            background-color: black;
+            color: #ffffff;
+            border-radius: 7px;
+            padding: 10px;
+        }
+
+        #OrderItemDiv {
+            display: flex;
+            flex-direction: column;
+            height: 45px;
+            position: relative;
+        }
+
+        #OrderItemImageQuantityPrice {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        #OrderItemName {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        #OrderItemImageQuantityPrice .OrderItemImageOriginal {
+            height: 45px;
+            width: 45px;
+            border-radius: 7px;
+        }
+
+
+        #OrderItemDiv button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: red;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .pending-order-item {
+            margin-top: 15px;
+        }
+
+        .confirm {
+            height: 150px;
+            width: 250px;
+            background-color: white;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .confirmButton {
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="container">
+
+
+        <h1>Admin Panel</h1>
+        <fieldset>
+            <legend>Mobile Number</legend>
+            <input type="number" id="mobileNumber" required placeholder="Please Enter Mobile Number" maxlength="10" />
+        </fieldset>
+        <div class="order-actions">
+            <button id="fetchDataButton" onclick="fetchData()">Fetch Data</button>
+            <button id="goInsideButton" onclick="goInside()"> Go Inside </button>
+        </div>
+        <a href="addItem.html"><button id="addItemButton">Add New Item</button></a>
+        <button id="loadOrdersButton" onclick="loadPendingOrders()">All Recent Orders</button>
+
+
+        <div id="adminPanelContainer"></div>
+        <div id="dataContainer"></div>
+        <div id="cartContainer"></div>
+        <div id="ordersContainer"></div>
+
+        <div class="confirm">
+            <img style="position: absolute; top: 10px; right: 10px; height: 10px; width:10px;" src="crossImage.png"
+                alt="" onclick="closeConfirm()">
+            <h1>Are You sure?</h1>
+            <button class="confirmButton"><span>Confirm</span></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, deleteDoc, addDoc } from 'https://www.gstatic.com/firebasejs/9.1.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        function closeConfirm() {
+            document.querySelector('.confirm').style.display = 'none';
+        }
+        window.closeConfirm = closeConfirm;
+
+        async function loadPendingOrders() {
+            const fetchDataButton = document.getElementById('fetchDataButton');
+            // fetchDataButton.disabled = true; // Disable the button while processing
+            fetchDataButton.style.backgroundColor = 'grey'
+            const goInsideButton = document.getElementById('goInsideButton');
+            // goInsideButton.disabled = true;
+            goInsideButton.style.backgroundColor = 'grey'
+            const addItemButton = document.getElementById('addItemButton');
+            // addItemButton.disabled = true;
+            addItemButton.style.backgroundColor = 'grey'
+            const loadOrdersButton = document.getElementById('loadOrdersButton');
+            // loadOrdersButton.disabled = true;
+            loadOrdersButton.style.backgroundColor = 'green' // Disable the button immediately after the first click
+
+            const button = document.getElementById('loadOrdersButton');
+            button.disabled = true;
+
+            document.getElementById("adminPanelContainer").innerHTML = '';
+            document.getElementById("dataContainer").innerHTML = '';
+            document.getElementById("cartContainer").innerHTML = '';
+            document.getElementById("ordersContainer").innerHTML = ''; // Clear previous data
+
+            const adminPanelContainer = document.getElementById('adminPanelContainer');
+            adminPanelContainer.innerHTML = ''; // Clear previous data
+
+            try {
+                // Get all user documents
+                const usersRef = collection(db, 'users');
+                const usersSnapshot = await getDocs(usersRef);
+
+                // Get all pending orders across users
+                const allPendingOrders = [];
+
+                // Create an array of promises to fetch pending orders for each user
+                const userPromises = usersSnapshot.docs.map(async (userDoc) => {
+                    const mobileNumber = userDoc.id; // Assuming document ID is the mobile number
+                    const ordersRef = collection(db, 'users', mobileNumber, 'orders');
+                    const ordersSnapshot = await getDocs(ordersRef);
+
+                    ordersSnapshot.docs.forEach(orderDoc => {
+                        const orderData = orderDoc.data();
+                        if (orderData.status === 'Pending') {
+                            allPendingOrders.push({ ...orderData, orderId: orderDoc.id, userMobileNumber: mobileNumber });
+                        }
+                    });
+                });
+
+                // Wait for all user promises to resolve
+                await Promise.all(userPromises);
+
+                // Sort orders by timestamp in descending order
+                allPendingOrders.sort((a, b) => b.timestamp.toDate() - a.timestamp.toDate());
+
+                // Display all pending orders
+                allPendingOrders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'pending-order-item';
+
+                    // Get and format the timestamp
+                    const orderDate = order.timestamp.toDate();
+                    const formattedTime = orderDate.toLocaleString();
+
+                    // Create a container for the timestamp
+                    const timestampElement = document.createElement('div');
+                    timestampElement.className = 'order-timestamp';
+                    timestampElement.innerHTML = `<strong>Time:</strong> ${formattedTime}<br>`;
+
+                    // Create a container for order details
+                    const orderDetailsElement = document.createElement('div');
+                    orderDetailsElement.className = 'order-details';
+                    orderDetailsElement.innerHTML = `
+                <div class="user-mobile-number"><strong>Mobile Number:</strong> ${order.userMobileNumber}</div>
+                <div class="order-status"><strong>Status:</strong> ${order.status}</div>
+                <div class="order-total-amount"><strong>Total Amount:</strong> ₹${order.totalAmount}</div>
+                <div class="order-id"><strong>Order ID:</strong> ${order.orderId}</div>
+                
+            `;
+
+                    // Append timestamp and details to the order element
+
+
+
+                    // Display items in the order
+                    order.order.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.className = 'order-item';
+                        itemElement.innerHTML = `
+                    <div id="OrderItemDiv">
+                        <div id="OrderItemImageQuantityPrice">
+                            <div id="OrderItemImage">
+                                <img class="OrderItemImageOriginal" src="${item.itemImage}" alt="${item.itemName}" width="50"><br>
+                            </div>
+                            <div id="OrderItemQuantity">
+                                <strong>Quantity:</strong> ${item.quantity}<br>
+                            </div>
+                            <div id="OrderItemPrice">
+                                <strong>Price:</strong> ₹${item.itemPrice}<br>
+                            </div>
+                        </div>
+                        <div id="OrderItemName">
+                            <strong>Name:</strong> ${item.itemName}<br>
+                        </div>
+                    </div>
+                `;
+                        orderElement.appendChild(itemElement);
+                    });
+
+                    // Add approve/reject/edit buttons for each pending order
+                    const orderActions = document.createElement('div');
+                    orderActions.className = 'order-actions';
+
+                    const approveButton = document.createElement('button');
+
+                    approveButton.textContent = 'Approve';
+                    // approveButton.onclick = () => handleOrderApproval(order.orderId, order) && loadPendingOrders();
+                    approveButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = '#4CAF50'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Approve</span>`
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderApproval(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+
+                        }
+                    };
+                    orderActions.appendChild(approveButton);
+
+                    const rejectButton = document.createElement('button');
+                    rejectButton.textContent = 'Reject';
+                    rejectButton.style.backgroundColor = 'red';
+                    rejectButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        // document.querySelector('.confirmButton').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = 'red'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Reject</span>`
+
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderRejection(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+                        }
+
+                    };
+
+                    // rejectButton.onclick = () => handleOrderRejection(order.orderId, order) && loadPendingOrders();
+                    // rejectButton.onclick = () => loadPendingOrders();
+                    orderActions.appendChild(rejectButton);
+
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'Edit';
+                    editButton.style.backgroundColor = 'yellow';
+
+                    editButton.onclick = () => {
+                        document.querySelector('.confirm').style.display = 'block';
+                        document.querySelector('.confirmButton').style.backgroundColor = 'yellow'
+                        document.querySelector('.confirmButton').innerHTML = `<span>Edit</span>`
+                        document.querySelector('.confirmButton').onclick = () => {
+                            document.querySelector('.confirm').style.display = 'none';
+                            handleOrderEdit(order.orderId, order);
+                            setTimeout(() => {
+                                loadPendingOrders();
+                            }, 5000); // 5000 milliseconds = 5 seconds
+                        }
+                    };
+
+                    // editButton.onclick = () => loadPendingOrders();
+                    orderActions.appendChild(editButton);
+
+                    orderElement.appendChild(orderActions);
+                    orderElement.appendChild(orderDetailsElement);
+                    orderDetailsElement.appendChild(timestampElement);
+                    adminPanelContainer.appendChild(orderElement);
+                });
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            } finally {
+                button.disabled = false; // Re-enable the button after processing
+            }
+        }
+
+
+
+
+        window.loadPendingOrders = loadPendingOrders;
+
+
+
+        window.fetchData = async function () {
+            const mobileNumber = document.getElementById('mobileNumber').value;
+            if (mobileNumber === "") {
+                alert("Please enter mobile number");
+                return;
+            }
+            document.getElementById("adminPanelContainer").innerHTML = '';
+            document.getElementById("dataContainer").innerHTML = '';
+            document.getElementById("cartContainer").innerHTML = '';
+            document.getElementById("ordersContainer").innerHTML = ''; // Clear previous data
+            const dataContainer = document.getElementById('dataContainer');
+            const cartContainer = document.getElementById('cartContainer');
+            const ordersContainer = document.getElementById('ordersContainer');
+            dataContainer.innerHTML = ''; // Clear previous data
+            cartContainer.innerHTML = ''; // Clear previous cart data
+            ordersContainer.innerHTML = ''; // Clear previous orders data
+            const fetchDataButton = document.getElementById('fetchDataButton');
+            // fetchDataButton.disabled = true; // Disable the button while processing
+            fetchDataButton.style.backgroundColor = 'green'
+            const goInsideButton = document.getElementById('goInsideButton');
+            // goInsideButton.disabled = true;
+            goInsideButton.style.backgroundColor = 'grey'
+            const addItemButton = document.getElementById('addItemButton');
+            // addItemButton.disabled = true;
+            addItemButton.style.backgroundColor = 'grey'
+            const loadOrdersButton = document.getElementById('loadOrdersButton');
+            // loadOrdersButton.disabled = true;
+            loadOrdersButton.style.backgroundColor = 'grey'
+
+
+
+            if (mobileNumber) {
+                try {
+                    const docRef = doc(db, 'users', mobileNumber);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        const dataItem = document.createElement('div');
+                        dataItem.classList.add('data-item');
+
+                        // Display top-level fields
+                        dataItem.innerHTML = `<strong>Name:</strong> ${data.name}<br>
+                                              <strong>Password:</strong> ${data.password}<br>
+                                              
+                                              <strong>Wallet Amount:</strong> ₹${data.referralAmount}<br>
+                                              <strong>Referral Phone Number:</strong> ${data.referralPhoneNumber}`;
+
+
+                        // Fetch and display nested records if they exist
+                        const recordsRef = collection(docRef, 'records');
+                        const recordsSnapshot = await getDocs(recordsRef);
+                        if (!recordsSnapshot.empty) {
+                            const recordsContainer = document.createElement('div');
+                            recordsContainer.innerHTML = '<strong>My Family Members:</strong>';
+                            recordsSnapshot.forEach((recordDoc) => {
+                                const recordData = recordDoc.data();
+                                const recordItem = document.createElement('div');
+                                recordItem.classList.add('record-item');
+                                recordItem.innerHTML = `<strong>Name:</strong> ${recordData.name}<br>
+                                                        <strong>Date of Birth:</strong> ${recordData.dob}`;
+                                recordsContainer.appendChild(recordItem);
+                            });
+                            dataItem.appendChild(recordsContainer);
+                        } else {
+                            dataItem.innerHTML += '<p>No records found</p>';
+                        }
+
+                        dataContainer.appendChild(dataItem);
+
+                        // Fetch and display cart items if they exist
+                        const cartRef = collection(docRef, 'cart'); // Ensure 'cart' is the correct path
+                        const cartSnapshot = await getDocs(cartRef);
+                        if (!cartSnapshot.empty) {
+                            const cartContainerTitle = document.createElement('h2');
+                            cartContainerTitle.textContent = "Cart";
+                            cartContainer.appendChild(cartContainerTitle);
+
+                            cartSnapshot.forEach((cartDoc) => {
+                                const cartData = cartDoc.data();
+
+                                const cartItem = document.createElement('div');
+                                cartItem.classList.add('cart-item');
+                                cartItem.innerHTML = `<strong>Item:</strong> ${cartData.itemName}<br>
+                                                      <strong>Quantity:</strong> ${cartData.quantity}<br>
+                                                      <strong>Price:</strong> ₹${cartData.itemPrice}<br>
+                                                      
+                                                      `;
+                                cartContainer.appendChild(cartItem);
+                            });
+                        } else {
+                            cartContainer.innerHTML = '<p>No cart items found</p>';
+                        }
+
+                        // Fetch and display order details if they exist
+                        const ordersRef = collection(docRef, 'orders');
+                        const ordersSnapshot = await getDocs(ordersRef);
+                        if (!ordersSnapshot.empty) {
+                            const ordersContainerTitle = document.createElement('h2');
+                            ordersContainerTitle.textContent = "Orders";
+                            ordersContainer.appendChild(ordersContainerTitle);
+
+                            // Convert the ordersSnapshot to an array and sort by timestamp
+                            const sortedOrders = ordersSnapshot.docs.sort((a, b) => {
+                                return b.data().timestamp.toDate() - a.data().timestamp.toDate();
+                            });
+
+                            sortedOrders.forEach((orderDoc) => {
+                                const orderData = orderDoc.data();
+                                const orderId = orderDoc.id;
+
+                                orderData.order.forEach((item, index) => {
+                                    // Create a container for each item in the order
+                                    const orderItem = document.createElement('div');
+                                    orderItem.classList.add('order-item');
+
+                                    // Add the item details to the container
+                                    orderItem.innerHTML = `
+                <div id="OrderItemDiv">
+                    <div id="OrderItemImageQuantityPrice">
+                        <div id="OrderItemImage">
+                            <img class="OrderItemImageOriginal" src="${item.itemImage}" alt="${item.itemName}" width="50"><br>
+                        </div>
+                        <div id="OrderItemQuantity">
+                            <strong>Quantity:</strong> ${item.quantity}<br>
+                        </div>
+                        <div id="OrderItemPrice">
+                            <strong>Price:</strong> ₹${item.itemPrice}<br>
+                        </div>
+                    </div>
+                    <div id="OrderItemName">
+                        <strong>Name:</strong> ${item.itemName}<br>
+                    </div>
+                </div>
+            `;
+
+                                    // Append the item container to the main orders container
+                                    ordersContainer.appendChild(orderItem);
+                                });
+
+                                const orderItemId = document.createElement('div');
+                                orderItemId.classList.add('order-item-id');
+                                orderItemId.innerHTML = `<strong>Order Id: ${orderId}</strong><br>`;
+
+                                const orderDate = orderData.timestamp.toDate();
+                                const formattedTime = orderDate.toLocaleString();
+                                const orderItemTime = document.createElement('div');
+                                orderItemTime.classList.add('order-item-time');
+                                orderItemTime.innerHTML = `<strong>Time: ${formattedTime}</strong><br>`;
+
+
+
+
+                                // After listing all items, add a separate div for the order-level details
+                                const orderDetails = document.createElement('div');
+                                orderDetails.classList.add('order-details');
+
+
+                                orderDetails.innerHTML = `
+            <strong>Status:</strong> ${orderData.status}<br>
+            <strong>Total Amount:</strong> ₹${orderData.totalAmount}<br>
+`;
+                                orderDetails.appendChild(orderItemId);
+                                orderDetails.appendChild(orderItemTime);
+                                // Append the order details container to the main orders container
+                                ordersContainer.appendChild(orderDetails);
+
+
+
+                                // Add approve/reject/edit buttons for each order
+                                const orderActions = document.createElement('div');
+                                orderActions.classList.add('order-actions');
+
+                                const approveButton = document.createElement('button');
+                                approveButton.textContent = 'Approve';
+
+                                approveButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = '#4CAF50'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Approve</span>`
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderApproval(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+
+                                    }
+                                };
+                                orderActions.appendChild(approveButton);
+
+                                const rejectButton = document.createElement('button');
+                                rejectButton.textContent = 'Reject';
+                                rejectButton.style.backgroundColor = 'red';
+                                rejectButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    // document.querySelector('.confirmButton').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = 'red'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Reject</span>`
+
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderRejection(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+                                    }
+
+                                };
+                                orderActions.appendChild(rejectButton);
+
+                                const editButton = document.createElement('button');
+                                editButton.textContent = 'Edit';
+                                editButton.style.backgroundColor = 'yellow';
+                                editButton.onclick = () => {
+                                    document.querySelector('.confirm').style.display = 'block';
+                                    document.querySelector('.confirmButton').style.backgroundColor = 'yellow'
+                                    document.querySelector('.confirmButton').innerHTML = `<span>Edit</span>`
+                                    document.querySelector('.confirmButton').onclick = () => {
+                                        document.querySelector('.confirm').style.display = 'none';
+                                        handleOrderEdit(orderDoc.id, orderData);
+                                        setTimeout(() => {
+                                            location.reload();
+                                        }, 5000); // 5000 milliseconds = 5 seconds
+                                    }
+                                };
+                                orderActions.appendChild(editButton);
+
+                                if (orderData.status === 'Approved') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                if (orderData.status === 'Rejected') {
+                                    approveButton.classList.add('hidden');
+                                    rejectButton.classList.add('hidden');
+                                    editButton.classList.add('hidden');
+                                }
+
+                                ordersContainer.appendChild(orderActions);
+                            });
+                        } else {
+                            ordersContainer.innerHTML = '<p>No orders found</p>';
+                        }
+                    } else {
+                        dataContainer.innerHTML = '<p>No data found for this mobile number</p>';
+                    }
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                }
+            }
+        }
+
+        async function handleOrderApproval(orderId, orderData) {
+            console.log("Approved order with ID:", orderId);
+
+            // Calculate the total amount and referral amount (10% of the total amount)
+            const totalAmount = orderData.totalAmount;
+            console.log(totalAmount);
+            const referralAmount = totalAmount * 0.05;
+
+            // Get the user document to fetch the referral phone number
+            const userDocRef = doc(db, 'users', orderData.userMobileNumber);
+
+            try {
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    const referralNumber = userData.referralPhoneNumber;
+
+                    if (referralNumber) {
+                        // Reference to the referral user's document
+                        const referralDocRef = doc(db, 'users', referralNumber);
+                        const referralDocSnap = await getDoc(referralDocRef);
+
+                        if (referralDocSnap.exists()) {
+                            // Referral number exists, update its wallet
+                            console.log(`Referral number found: ${referralNumber}`);
+
+                            // Update or create the 'referralAmount' field in the referral user's document
+                            const referralData = referralDocSnap.data();
+                            const currentReferralAmount = referralData.referralAmount || 0;
+                            const updatedReferralAmount = currentReferralAmount + referralAmount;
+
+                            await updateDoc(referralDocRef, {
+                                referralAmount: updatedReferralAmount
+                            });
+
+                            console.log(`Referral amount ₹${referralAmount} added to the referral wallet of ${referralNumber}`);
+                        } else {
+                            console.log(`Referral number ${referralNumber} does not exist.`);
+                            // Optionally, you could create a new document for the referral number if needed
+                        }
+                    } else {
+                        console.log("No referral number available in user data.");
+                    }
+                } else {
+                    console.log("User document does not exist.");
+                }
+            } catch (error) {
+                console.error("Error fetching or updating referral amount:", error);
+            }
+
+            // Update the status of the order to 'Approved'
+            try {
+                const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                await updateDoc(orderDocRef, { status: 'Approved' });
+
+                console.log("Order status updated to 'Approved'");
+            } catch (error) {
+                console.error("Error updating order status:", error);
+            }
+
+            // Refresh data after approval
+            location.reload();
+        }
+
+
+        async function handleOrderRejection(orderId, orderData, mobileNumber, removeTotalAmount) {
+            console.log("Rejected order with ID:", orderId);
+
+            // const totalAmount = orderData.order.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+            // const totalAmountOriginal = orderData.totalAmount
+            // const referralAmount = totalAmount - totalAmountOriginal
+
+            // Calculate the total amount of the order
+            //  try {
+
+            //   const walletRef = doc(db, 'users', mobileNumber);
+            // const walletSnap = await getDoc(walletRef); 
+
+            // const walletData = walletSnap.data();
+            //    console.log('removeTotalAmount: ',removeTotalAmount);
+            //    console.log('totalAmount: ',totalAmount);
+            //    const amountUsedFromWallet = removeTotalAmount - totalAmount;
+
+            // await updateDoc(walletRef, {
+            //     referralAmount: referralAmount
+            // });
+
+            //        console.log('referralAmount',walletData.referralAmount);
+
+            //        } catch (error) {
+            //     console.error("Error loading wallet info: ", error);
+            //  }
+
+
+
+
+            // Check if userMobileNumber is present in orderData
+            const userMobileNumber = orderData.userMobileNumber;
+            if (userMobileNumber) {
+                const totalAmount = orderData.order.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+                const totalAmountOriginal = orderData.totalAmount
+                const referralAmount = totalAmount - totalAmountOriginal
+                try {
+                    const walletRef = doc(db, 'users', userMobileNumber);
+                    await updateDoc(walletRef, {
+                        referralAmount: referralAmount
+                    });
+
+                    console.log("Referral amount added ₹" + referralAmount);
+                    // Reference to the specific order document
+                    const orderDocRef = doc(db, 'users', userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { status: 'Rejected' });
+
+                    console.log("Order status updated to 'Rejected'");
+                } catch (error) {
+                    console.error("Error updating order status:", error);
+                }
+            } else {
+                console.log("Mobile number is missing in orderData:", orderData);
+            }
+
+            // Refresh data after Rejection
+            location.reload();
+        }
+
+
+        async function handleOrderEdit(orderId, orderData) {
+            const newQuantity = prompt('Enter new quantity for the item:', '1');
+            if (newQuantity) {
+                try {
+                    // Assuming that orderData.order is an array of items
+                    const updatedOrder = { ...orderData };
+                    updatedOrder.order[0].quantity = newQuantity; // Update quantity of the first item for demonstration
+
+                    // Reference to the specific order document
+                    const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                    await updateDoc(orderDocRef, { order: updatedOrder.order });
+
+                    console.log("Order updated with ID:", orderId);
+                    location.reload(); // Refresh data after editing
+                } catch (error) {
+                    console.error("Error updating order:", error);
+                }
+            }
+        }
+
+        async function goInside() {
+            const goInsideNumber = document.getElementById('mobileNumber').value.trim();
+            if (goInsideNumber === "") {
+                alert("Please Enter Number First");
+                return;
+            }
+            if (goInsideNumber.length !== 10) {
+                alert("Please Enter a Valid 10-Digit Mobile Number");
+                return;
+            }
+
+            try {
+                // Query Firestore to check if the mobile number exists
+                const docRef = doc(db, "users", goInsideNumber);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    // Mobile number found in the database, proceed with redirection
+                    window.location.href = "login.html?mobile=" + goInsideNumber;
+                } else {
+                    // Mobile number not found in the database
+                    alert("Mobile Number not found in the database. Please enter a registered mobile number.");
+                }
+            } catch (error) {
+                console.error("Error checking mobile number: ", error);
+                alert("An error occurred while checking the mobile number. Please try again later.");
+            }
+        }
+        window.goInside = goInside;
+        window.handleOrderRejection = handleOrderRejection;
+        window.handleOrderApproval = handleOrderApproval;
+        window.handleOrderEdit = handleOrderEdit;
+
+    </script>
+</body>
+
+</html>

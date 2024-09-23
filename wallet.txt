@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            
+            padding: 20px;
+            background-image: url(cakeBackground.jpg);
+        }
+        
+        .wallet-info {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+        }
+        
+        .amount {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img onclick="goToLogin()" src="backImage.jpg" alt="" style="height: 50px;width: 50;  margin-top: 10px; align-self: center;">
+    <div id="walletInfo" class="wallet-info"></div>
+
+    <!-- <details style="text-align: center; margin-top: 20px; " >
+        <summary style="text-align: center; font-size: 20px; font-weight: bold;" >
+            <hr>
+            <p>How to earn wallet amount?</p>
+        <p>वॉलेट राशि कैसे अर्जित करें?</p>
+        <hr>
+    </summary>
+
+    <div style="text-align: center; font-size: 20px; font-weight: bold;  border-radius: 5px;" >
+        
+        <p><u>Hindi</u></p>
+        <p>सबसे पहले आपको अपने दोस्त को रेफर करना होगा। ऐसा करने के लिए, अपने मित्र का फोन लें और साइन अप पर जाएं, फिर नीचे की ओर एक रेफरल नंबर अनुभाग होगा। इसमें अपना रजिस्टर्ड नंबर भरें और SIGN UP पर क्लिक करें |</p>
+        <p>इसके बाद, यदि आपका संदर्भित मित्र कोई वस्तु खरीदता है, तो आपको उस वस्तु का 5% आपके बटुए में मिलेगा और आप इसका उपयोग करने के लिए स्वतंत्र हैं ।</p>
+        <hr>
+        <p><u>English</u></p>
+        <p>First of all you need to refer your friend. To do so, take your friend's phone and go to SIGN UP then down side there will a referral number section. Fill your registered number in it and click SIGN UP.</p>
+        <p>After, If your referred friend purchase any item, you will get 5% of that item in your wallet and you are free to use it</p>
+    </div>
+    </details> -->
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadWalletInfo() {
+            const queryParams = new URLSearchParams(window.location.search);
+            const mobile = queryParams.get('mobile');
+
+            function goToLogin() {
+            window.location.href = `login.html?mobile=${mobile}`;
+        }
+        window.goToLogin = goToLogin;
+
+            if (!mobile) {
+                document.getElementById('walletInfo').innerHTML = '<p>No mobile number provided.</p>';
+                return;
+            }
+
+            try {
+                // Fetch user wallet information
+                const walletRef = doc(db, 'users', mobile);
+                const walletSnap = await getDoc(walletRef);
+
+                if (walletSnap.exists()) {
+                    const walletData = walletSnap.data();
+                    const referralAmount = walletData.referralAmount || 0;
+                    // const balance = walletData.wallet?.balance || 0;
+                    // const bonus = walletData.wallet?.bonus || 0;
+
+                    const walletInfo = `
+                        <p><strong>Referral Amount:</strong> ₹${referralAmount}</p>
+                    `;
+                    document.getElementById('walletInfo').innerHTML = walletInfo;
+                } else {
+                    document.getElementById('walletInfo').innerHTML = '<p>No wallet information found.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading wallet info: ", error);
+                document.getElementById('walletInfo').innerHTML = '<p>Error loading wallet information.</p>';
+            }
+        }
+
+        
+      
+        loadWalletInfo();
+    </script>
+</body>
+</html>

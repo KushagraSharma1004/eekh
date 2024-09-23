@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .search-container {
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .results-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .results-container img {
+            width: 100%;
+            height: auto;
+            max-width: 150px;
+            cursor: pointer;
+            border-radius: 5px;
+            height: 100px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 90%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 100%;
+            max-height: 80%;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fff;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+        }
+
+        .more-button {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            max-width: 150px;
+            margin-top: 20px;
+        }
+
+        .more-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="search-container">
+        <form id="search-form">
+            <input type="text" id="search-input" name="q" placeholder="Search Images..." required>
+            <button type="submit">Search</button>
+        </form>
+        <div id="results" class="results-container"></div>
+        <button id="more-button" class="more-button" style="display: none;">More</button>
+    </div>
+
+    <!-- Modal for full-size image display -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <img id="modalImage" src="" alt="">
+        </div>
+    </div>
+
+    <script>
+        const API_KEY = 'AIzaSyBo9cVy7f-HhQNJqmBAIkf0YvxojErT0sE';  // Replace with your API key
+        const CX = '75a7af22c26e641c9';  // Replace with your Search Engine ID
+        let nextPageToken = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('search-form');
+            const input = document.getElementById('search-input');
+            const resultsContainer = document.getElementById('results');
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeBtn = document.querySelector('.close');
+            const moreButton = document.getElementById('more-button');
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const query = input.value.trim();
+                if (query) {
+                    fetchImages(query);
+                }
+            });
+
+            moreButton.addEventListener('click', () => {
+                const query = input.value.trim();
+                if (query) {
+                    fetchImages(query, nextPageToken);
+                }
+            });
+
+            function fetchImages(query, pageToken = '') {
+                const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&cx=${CX}&key=${API_KEY}&searchType=image${pageToken ? `&pageToken=${pageToken}` : ''}`;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.items) {
+                            displayResults(data.items);
+                            nextPageToken = data.nextPage ? data.nextPage[0].pageToken : '';
+                            moreButton.style.display = nextPageToken ? 'block' : 'none';
+                        } else {
+                            resultsContainer.innerHTML = '<p>No images found.</p>';
+                            moreButton.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error fetching images:', error));
+            }
+
+            function displayResults(items) {
+                items.forEach(item => {
+                    if (item.link && item.mime === 'image/jpeg' || item.mime === 'image/png' || item.mime === 'image/gif') {
+                        const img = document.createElement('img');
+                        img.src = item.link;
+                        img.alt = item.title || 'Image';
+                        img.addEventListener('click', () => {
+                            openModal(item.link);
+                        });
+                        resultsContainer.appendChild(img);
+                    }
+                });
+            }
+
+            function openModal(src) {
+                modal.style.display = 'flex';
+                modalImage.src = src;
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+
+            closeBtn.addEventListener('click', closeModal);
+
+            window.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

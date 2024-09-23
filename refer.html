@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refer Button</title>
+</head>
+
+<body>
+    <!-- Refer Button -->
+    <button id="refer-button">Refer</button>
+
+    <script>
+        document.getElementById('refer-button').addEventListener('click', () => {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Check out Flipkart!',
+                    url: 'https://www.flipkart.com'
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                }).catch((error) => {
+                    console.error('Error sharing:', error);
+                });
+            } else {
+                alert('Share not supported on this browser.');
+            }
+        });
+    </script>
+</body>
+
+</html>

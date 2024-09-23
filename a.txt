@@ -1,0 +1,80 @@
+I want to send the full order details on whatsapp on the respective number sat the last of the code before fetchData() function. async function handleOrderApproval(orderId, orderData) {
+            console.log("Approved order with ID:", orderId);
+
+            // Calculate the total amount and referral amount (5% of the total amount)
+            const totalAmount = orderData.totalAmount;
+            console.log(totalAmount);
+            const referralAmount = totalAmount * 0.05;
+
+            // Get the user document to fetch the referral phone number
+            const userDocRef = doc(db, 'users', orderData.userMobileNumber);
+
+            try {
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    const referralNumber = userData.referralPhoneNumber;
+
+                    if (referralNumber) {
+                        // Reference to the referral user's document
+                        const referralDocRef = doc(db, 'users', referralNumber);
+                        const referralDocSnap = await getDoc(referralDocRef);
+
+                        if (referralDocSnap.exists()) {
+                            // Referral number exists, update its wallet
+                            console.log(`Referral number found: ${referralNumber}`);
+                            const couponApplied = orderData.couponApplied;
+                            // Update or create the 'referralAmount' field in the referral user's document
+                            const referralData = referralDocSnap.data();
+                            const currentReferralAmount = referralData.referralAmount || 0;
+                            const updatedReferralAmount = currentReferralAmount + referralAmount;
+
+                            // Prepare wallet transaction details for the history
+                            const walletHistory = referralData.walletHistory || [];
+                            // if (couponApplied === "WALLETOFF50%") {
+                            walletHistory.push({
+                                type: 'Addition',
+                                amount: referralAmount,
+                                date: new Date(),
+                                reason: 'Order Approved',
+                                previousBalance: currentReferralAmount
+                            });
+
+                            // Update the referral amount and wallet history in the database
+                            await updateDoc(referralDocRef, {
+                                referralAmount: updatedReferralAmount,
+                                walletHistory: walletHistory
+                            });
+                            // }
+                            console.log(`Referral amount ₹${referralAmount} added to the referral wallet of ${referralNumber}`);
+                        } else {
+                            console.log(`Referral number ${referralNumber} does not exist.`);
+                        }
+                    } else {
+                        console.log("No referral number available in user data.");
+                    }
+                } else {
+                    console.log("User document does not exist.");
+                }
+            } catch (error) {
+                console.error("Error fetching or updating referral amount:", error);
+            }
+
+            // Update the status of the order to 'Approved'
+            try {
+                const orderDocRef = doc(db, 'users', orderData.userMobileNumber, 'orders', orderId);
+                await updateDoc(orderDocRef, { status: 'Approved' });
+
+                console.log("Order status updated to 'Approved'");
+            } catch (error) {
+                console.error("Error updating order status:", error);
+            }
+
+            
+
+            // Refresh data after approval
+            // location.reload();
+            fetchData()
+
+        }.  

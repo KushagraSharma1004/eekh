@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #passwordPrompt {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #menuForm {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="text"], input[type="number"], input[type="password"] {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #menuItems {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 500px;
+            text-align: left;
+        }
+        .menu-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .menu-item img {
+            max-width: 100px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        .menu-item span {
+            font-size: 18px;
+            vertical-align: middle;
+        }
+    </style>
+    
+    <script type="module" >
+
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Password check
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === '1234@') {
+                document.getElementById('passwordPrompt').style.display = 'none';
+                document.getElementById('menuForm').style.display = 'flex';
+                loadMenuItems(); // Load existing menu items
+            } else {
+                alert('Incorrect Password!');
+            }
+        }
+
+        // Add item to Firestore
+        async function addItem() {
+            const itemName = document.getElementById('itemName').value;
+            const itemImage = document.getElementById('itemImage').value;
+            const itemPrice = document.getElementById('itemPrice').value;
+
+            if (itemName && itemImage && itemPrice) {
+                await addDoc(collection(db, 'menu'), {
+                    itemName,
+                    itemImage,
+                    itemPrice: parseFloat(itemPrice)
+                });
+                alert(`Item ${itemName} added successfully!`);
+                loadMenuItems(); // Reload the menu items
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemImage').value = '';
+                document.getElementById('itemPrice').value = '';
+            } else {
+                alert('Please fill in all fields!');
+            }
+        }
+
+        // Load existing menu items from Firestore
+        async function loadMenuItems() {
+            const menuItemsContainer = document.getElementById('menuItems');
+            menuItemsContainer.innerHTML = ''; // Clear previous items
+
+            const querySnapshot = await getDocs(collection(db, 'menu'));
+            querySnapshot.forEach(doc => {
+                const item = doc.data();
+                const itemElement = document.createElement('div');
+                itemElement.className = 'menu-item';
+                itemElement.innerHTML = `
+                    <img src="${item.itemImage}" alt="${item.itemName}">
+                    <span>${item.itemName} - Rs. ${item.itemPrice}</span>
+                `;
+                menuItemsContainer.appendChild(itemElement);
+            });
+        }
+
+        // Make functions accessible globally
+        window.checkPassword = checkPassword;
+        window.addItem = addItem;
+
+    </script>
+</head>
+<body>
+    <div id="passwordPrompt">
+        <h2>Enter Password to Access Menu Management</h2>
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button onclick="checkPassword()">Submit</button>
+    </div>
+
+    <div id="menuForm">
+        <h2>Add New Menu Item</h2>
+        <input type="text" id="itemName" placeholder="Item Name">
+        <input type="text" id="itemImage" placeholder="Image URL">
+        <input type="number" id="itemPrice" placeholder="Price">
+        <button onclick="addItem()">Add Item</button>
+    </div>
+
+    <div id="menuItems"></div>
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu and Cart</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            background: url(cakeBackground.jpg);
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-bottom: 60px;
+        }
+        .menu-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 15px;
+            width: 140px;
+            text-align: center;
+        }
+        .menu-item img {
+            border-radius: 10%;
+            width: 100%;
+            height: auto;
+        }
+        .menu-item span {
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .menu-item button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            width: 105px;
+        }
+        .menu-item button:hover {
+            background-color: darkgreen;
+        }
+        .quantity-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            visibility: hidden;
+            display:none;
+        }
+        .quantity-controls button {
+            background-color: #ccc;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+        }
+        .quantity-controls button:hover {
+            background-color: #bbb;
+        }
+        .quantity-controls input {
+            width: 40px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 16px;
+        }
+        .cart-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: orange;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .cart-button:hover {
+            background-color: darkorange;
+        }
+        .message {
+            color: green;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Row 1 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item1">
+                <img src="cake1.jpeg" alt="Cake 1 Pound">
+                <span>Cake 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls1" class="quantity-controls">
+                    <button onclick="decreaseQuantity('quantity1')">-</button>
+                    <input type="number" id="quantity1" value="1" min="1">
+                    <button onclick="increaseQuantity('quantity1')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Cake 1 Pound', 280, 'cake1.jpeg', 'quantity1')" id="add-to-cart1">Add to Cart</button>
+                <div id="message1" class="message hidden">Item added to cart</div>
+            </div>
+            <!-- Other items here -->
+        </div>
+    </div>
+
+    <button class="cart-button" onclick="goToCart()">Go to Cart</button>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        window.handleAddToCart = async function (itemName, itemPrice, itemImage, quantityId) {
+            
+            const quantity = document.getElementById(quantityId).value;
+            const itemId = quantityId.slice(-1); 
+            document.getElementById(`quantity-controls${itemId}`).style.visibility='visible' // Extract item number from quantityId
+            const cartRef = collection(db, 'users', mobile, 'cart');
+            const querySnapshot = await getDocs(cartRef);
+            let itemExists = false;
+
+            for (const doc of querySnapshot.docs) {
+                const data = doc.data();
+                if (data.itemName === itemName) {
+                    itemExists = true;
+                    await setDoc(doc.ref, {
+                        ...data,
+                        quantity: (parseInt(data.quantity) + parseInt(quantity)).toString(),
+                        itemImage
+                    });
+                    break;
+                }
+            }
+
+            if (!itemExists) {
+                await addDoc(cartRef, {
+                    itemName,
+                    itemPrice,
+                    quantity,
+                    itemImage
+                });
+            }
+
+            // Update UI
+            document.getElementById(`add-to-cart${itemId}`).classList.add('hidden');
+            document.getElementById(`quantity-controls${itemId}`).style.visibility='visible'
+            document.getElementById(`quantity-controls${itemId}`).style.display='flex'
+            
+        }
+
+        window.increaseQuantity = function (quantityId) {
+            const input = document.getElementById(quantityId);
+            input.value = parseInt(input.value) + 1;
+            updateCartQuantity(quantityId, input.value);
+        };
+
+        window.decreaseQuantity = function (quantityId) {
+            const itemId = quantityId.slice(-1); 
+            const input = document.getElementById(quantityId);
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+                updateCartQuantity(quantityId, input.value);
+            } else if (parseInt(input.value) === 1) {
+                document.getElementById(`add-to-cart${quantityId.slice(-1)}`).classList.remove('hidden');
+                document.getElementById(`quantity-controls${quantityId.slice(-1)}`).classList.add('hidden');
+                document.getElementById(`quantity-controls${itemId}`).style.display='none'
+            }
+        };
+
+        function updateCartQuantity(quantityId, quantity) {
+            const itemId = quantityId.slice(-1);
+            // Update quantity in the database (you may need to adjust this part based on your Firestore structure)
+            // Assuming that `itemName` and `itemImage` are available, you need to update the database accordingly
+        }
+
+        function goToCart() {
+            window.location.href = `cart.html?mobile=${mobile}`;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu and Cart</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            background: url(cakeBackground.jpg);
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-bottom: 60px;
+        }
+        .menu-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 15px;
+            width: 140px;
+            text-align: center;
+        }
+        .menu-item img {
+            border-radius: 10%;
+            width: 100%;
+            height: auto;
+        }
+        .menu-item span {
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .menu-item button {
+            background-color: green;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            width: 105px;
+        }
+        .menu-item button:hover {
+            background-color: darkgreen;
+        }
+        .quantity-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            visibility: hidden;
+            display: none;
+        }
+        .quantity-controls button {
+            background-color: #ccc;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+        }
+        .quantity-controls button:hover {
+            background-color: #bbb;
+        }
+        .quantity-controls input {
+            width: 40px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 16px;
+        }
+        .cart-button {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: orange;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        .cart-button:hover {
+            background-color: darkorange;
+        }
+        .message {
+            color: green;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .a{
+            display:flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <div class="a" >
+        <!-- Row 1 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item1">
+                <img src="cake1.jpeg" alt="Cake 1 Pound">
+                <span>Cake 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls1" class="quantity-controls">
+                    <button onclick="decreaseQuantity('quantity1')">-</button>
+                    <input type="number" id="quantity1" value="1" min="1">
+                    <button onclick="increaseQuantity('quantity1')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Cake 1 Pound', 280, 'cake1.jpeg', 'quantity1')" id="add-to-cart1">Add to Cart</button>  <div id="message1" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item2">
+                <img src="cake2.jpeg" alt="Cake 2 Pounds">
+                <span>Cake 2 Pounds</span>
+                <span style="color: green;">Rs.560</span>
+                <div id="quantity-controls2" class="quantity-controls">
+                    <button onclick="decreaseQuantity('quantity2')">-</button>
+                    <input type="number" id="quantity2" value="1" min="1">
+                    <button onclick="increaseQuantity('quantity2')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Cake 2 Pounds', 560, 'cake2.jpeg', 'quantity2')" id="add-to-cart2">Add to Cart</button> <div id="message2" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+    </div>
+    <div class="a" >
+        <!-- Row 3 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item3">
+                <img src="cake3.jpeg" alt="Cake 3 Pounds">
+                <span>Cake 3 Pounds</span>
+                <span style="color: green;">Rs.840</span>
+                <div id="quantity-controls3" class="quantity-controls">
+                    <button onclick="decreaseQuantity('quantity3')">-</button>
+                    <input type="number" id="quantity3" value="1" min="1">
+                    <button onclick="increaseQuantity('quantity3')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Cake 3 Pounds', 840, 'cake3.jpeg', 'quantity3')" id="add-to-cart3">Add to Cart</button> <div id="message3" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item4">
+                <img src="cake4.jpeg" alt="Cake 4 Pounds">
+                <span>Cake 4 Pounds</span>
+                <span style="color: green;">Rs.1120</span>
+                <div id="quantity-controls4" class="quantity-controls">
+                    <button onclick="decreaseQuantity('quantity4')">-</button>
+                    <input type="number" id="quantity4" value="1" min="1">
+                    <button onclick="increaseQuantity('quantity4')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Cake 4 Pounds', 1120, 'cake4.jpeg', 'quantity4')" id="add-to-cart4">Add to Cart</button>  <div id="message4" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+    </div>  
+    </div>
+
+    <button class="cart-button" onclick="goToCart()">Go to Cart</button>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, deleteDoc  } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        async function loadCartData() {
+            const cartRef = collection(db, 'users', mobile, 'cart');
+            const querySnapshot = await getDocs(cartRef);
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const itemId = getItemIdByName(data.itemName);
+                
+                if (itemId) {
+                    document.getElementById(`quantity${itemId}`).value = data.quantity;
+                    document.getElementById(`quantity-controls${itemId}`).style.visibility = 'visible';
+                    document.getElementById(`quantity-controls${itemId}`).style.display = 'flex';
+                    document.getElementById(`add-to-cart${itemId}`).classList.add('hidden');
+                }
+            });
+        }
+
+        function getItemIdByName(itemName) {
+            const items = {
+                'Cake 1 Pound': 1,
+                'Cake 2 Pounds': 2,
+                'Cake 3 Pounds': 3,
+                'Cake 4 Pounds': 4
+            };
+            return items[itemName];
+        }
+
+        async function handleAddToCart(itemName, itemPrice, itemImage, quantityId) {
+    // Set the quantity to 1 when adding a new item
+    const quantity = 1;
+
+    const cartRef = collection(db, 'users', mobile, 'cart');
+    const querySnapshot = await getDocs(cartRef);
+
+    let itemExists = false;
+
+    // Check if the item already exists in the cart
+    for (const doc of querySnapshot.docs) {
+        const data = doc.data();
+        if (data.itemName === itemName) {
+            itemExists = true;
+            await setDoc(doc.ref, {
+                ...data,
+                quantity: (parseInt(data.quantity) + 1).toString(),  // Increment the quantity by 1
+                itemImage
+            });
+            break;
+        }
+    }
+
+    // If the item does not exist, add it with quantity 1
+    if (!itemExists) {
+        await addDoc(cartRef, {
+            itemName,
+            itemPrice,
+            quantity: quantity.toString(), // Set the initial quantity to 1
+            itemImage
+        });
+    }
+
+    // Update UI
+    const itemId = getItemIdByName(itemName);
+    document.getElementById(`add-to-cart${itemId}`).classList.add('hidden');
+    document.getElementById(`quantity-controls${itemId}`).style.visibility = 'visible';
+    document.getElementById(`quantity-controls${itemId}`).style.display = 'flex';
+}
+
+
+        window.increaseQuantity = function (quantityId) {
+            const input = document.getElementById(quantityId);
+            input.value = parseInt(input.value) + 1;
+            updateCartQuantity(quantityId, input.value);
+        };
+
+        window.decreaseQuantity = async function (quantityId) {
+    const itemId = quantityId.slice(-1);
+    const input = document.getElementById(quantityId);
+    const newQuantity = parseInt(input.value) - 1;
+
+    if (newQuantity > 0) {
+        input.value = newQuantity;
+        updateCartQuantity(quantityId, input.value);
+    } else if (newQuantity === 0) {
+        document.getElementById(`add-to-cart${itemId}`).classList.remove('hidden');
+        document.getElementById(`quantity-controls${itemId}`).classList.add('hidden');
+        document.getElementById(`quantity-controls${itemId}`).style.display = 'none';
+
+        // Remove the item from the cart in Firestore
+        const itemName = document.querySelector(`#item${itemId} span`).innerText;
+        const cartRef = collection(db, 'users', mobile, 'cart');
+        const querySnapshot = await getDocs(cartRef);
+
+        for (const doc of querySnapshot.docs) {
+            const data = doc.data();
+            if (data.itemName === itemName) {
+                await setDoc(doc.ref, {
+                    ...data,
+                    quantity: '0'
+                });
+                await deleteDoc(doc.ref); // Remove the document from the cart collection
+                break;
+            }
+        }
+    }
+};
+
+
+        async function updateCartQuantity(quantityId, quantity) {
+            const itemId = quantityId.slice(-1);
+            const itemName = document.querySelector(`#item${itemId} span`).innerText;
+            const itemImage = document.querySelector(`#item${itemId} img`).src;
+
+            const cartRef = collection(db, 'users', mobile, 'cart');
+            const querySnapshot = await getDocs(cartRef);
+
+            let itemExists = false;
+
+            for (const doc of querySnapshot.docs) {
+                const data = doc.data();
+                if (data.itemName === itemName) {
+                    itemExists = true;
+                    await setDoc(doc.ref, {
+                        ...data,
+                        quantity: quantity.toString(),
+                        itemImage
+                    });
+                    break;
+                }
+            }
+
+            if (!itemExists) {
+                console.error("Item not found in cart.");
+            }
+        }
+
+        function goToCart() {
+            window.location.href = `cart.html?mobile=${mobile}`;
+        }
+        window.goToCart = goToCart;
+        window.handleAddToCart = handleAddToCart;
+
+        // Load the cart data when the page loads
+        window.onload = loadCartData;
+    </script>
+</body>
+</html>

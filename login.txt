@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Global styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url(cakeBackground.jpg);
+        }
+
+        /* Styles for form container */
+        .container {
+            width: 100%;
+            max-width: 400px; /* Set maximum width of the form container */
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* Styles for form inputs */
+        /* input[type=date], input[type=number], input[type=text], input[type=password] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        } */
+
+        /* Styles for submit button */
+        input[type=submit], button {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin-top: 5px ;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type=submit]:hover, button:hover {
+            background-color: #45a049;
+        }
+
+        /* Styles for message div */
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Media query for smaller screens */
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+
+        /* Styles for modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            color: green;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #topBar {
+            height: 60px;
+            width: 100%;
+            display: flex;
+           align-items: center;
+           
+           z-index: 3;
+        }
+
+        .topBarH4Div span{
+            color: green;
+            font-size: 40px;
+            justify-self: center;
+            align-self: center;
+        }
+        .topBarH4Div{
+            font-weight: bold;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            align-content: center;
+            justify-content: center;
+            justify-items: center;
+        }
+
+        .topBarImg{
+            height: 50px;
+            width: 50px; 
+            z-index: 5;
+        }
+
+        
+
+        big{
+            color: green;
+        }
+        #welcome-referral{
+            color: darkgreen;
+        }
+        body {
+            background: url(cakeBackground.jpg);
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .menu-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            padding-bottom: 0px;
+        }
+        .menu-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0px;
+        }
+        .menu-item {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 5px;
+            padding: 15px;
+            width: 170px;
+            text-align: center;
+        }
+        .menu-item img {
+            border-radius: 10%;
+            width: 100%;
+            height: auto;
+        }
+        .menu-item span {
+            display: block;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .menu-item button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 5px;
+            width: 105px;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            visibility: hidden;
+            display: none;
+        }
+        
+        .quantity-controls .quantityControlButtonAdd {
+            background-color: green;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+        }
+
+        .quantity-controls .quantityControlButtonSub {
+            background-color: red;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+        }
+
+
+        
+        
+        .quantity-controls input {
+            width: 40px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 16px;
+        }
+        .cart-button {
+            margin-top: 5;
+            margin-bottom: 65px;
+            width: 100%;
+            background-color: orange;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+           
+        }
+        .cart-button:hover {
+            background-color: darkorange;
+        }
+        .message {
+            color: green;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0px;
+        }
+        .hidden {
+            display: none;
+        }
+        .a{
+            display:flex;
+        }
+        #name{
+            width: 49%;
+            padding: 12px 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #dob{
+            width: 49%;
+            padding: 12px 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #textAndInput{
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+        }
+        .nameRecordAndDobRecord{
+           margin-top: 5px;
+            display: flex;
+             justify-content: space-between;
+             height: 30px;
+        }
+        #recordsListName{
+            align-items: center;
+            justify-content: center;
+            align-content: center;
+            width: 175px;
+        }
+        #recordsListDob{
+            align-items: center;
+            justify-content: center;
+            align-content: center;
+            width: 175px;
+        }
+        .allRecords{
+            display: flex;
+           justify-content: space-between;
+        }
+
+
+
+        
+        @keyframes a {
+    0%{ opacity: 1;}
+    50%{ opacity: 0;}
+    100%{ opacity: 1;}
+  }
+
+  @keyframes b {
+    0%{ border-width: 5;}
+    50%{ border-width: 0;}
+    100%{ border-width: 5;}
+  }
+
+  #aDiv{
+    padding-top: 20px;
+    text-align: center;
+    
+  }
+
+  #aDiv big{
+    
+    text-align: center;
+    
+    
+  }
+
+  #off{
+    text-align: center;
+   animation: a 0.70s infinite;
+   padding-top: 25px;
+  }
+
+  #off big {
+    
+    text-align: center;
+     font-size: 25px;
+  }
+
+  .slider_container {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+  margin-top: 1px;
+}
+.slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  animation: 30s cubic-bezier(1, 0.95, 0.565, 1) sliding infinite;
+}
+.slide {
+  position: relative;
+  min-width: 100%;
+  height: 100%;
+}
+.slide img {
+  width: 100%;
+  height: 100%;
+}
+
+.slide.one {
+  background: linear-gradient(180deg, white, lightgreen, darkgreen)
+}
+.slide.two {
+  /* background: rgb(255, 64, 64); */
+}
+.slide.three {
+  /* background: rgb(11, 173, 188);
+ */}
+.slide.four {
+  /* background: rgb(11, 188, 14); */
+}
+.slide.five {
+  /* background: rgb(173, 11, 188); */
+}
+@keyframes sliding {
+  0% {
+    transform: translateX(0%);
+  }
+  20% {
+    transform: translateX(0%);
+  }
+  25% {
+    transform: translateX(-100%);
+  }
+  45% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(-200%);
+  }
+  70% {
+    transform: translateX(-200%);
+  }
+  75% {
+    transform: translateX(-300%);
+  }
+  95% {
+    transform: translateX(-300%);
+  }
+  100% {
+    transform: translateX(-400%);
+  }
+}
+
+.sliderImage1{
+  padding-left: 20px;
+}
+.sliderImage2{
+  padding-right: 20px;
+}
+.sliderImageAll{
+  padding-top: 30px;
+  justify-content: space-between;
+  display:flex;
+}
+
+#rightMenuBar {
+    visibility: hidden;
+    width: 250px;
+    height: 355px;
+    position: fixed;
+    right: 0;
+    bottom: 70px;
+    z-index: 100;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    overflow-y: auto;
+    /* animation: rightMenuBarAnimation 0.5s ease-out forwards; */
+}
+
+/* @keyframes rightMenuBarAnimation {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+} */
+
+
+  
+    </style>
+</head>
+<body>
+
+    <div id="rightMenuBar" >
+        <div style="margin-left: 20px;" >
+        <span style="font-size: 20px; font-weight: 800; color: darkgreen;" >eekh</span>
+        <img style="height: 20px; width: 20px; position: absolute; right: 10px; top: 10px;" src="crossImage.png" alt="cross" onclick="closeMenu()">
+        <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;" onclick="goToIndex()">
+        <img style="height: 20px; width: 20px;" src="logoutImage.png" alt="logout">
+        <span style="margin-left: 10px;" >Logout</span>
+    </div>
+
+    <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;" onclick="goToWallet()">
+        <img onclick="goToWallet()" src="walletImage.png" style="height: 20px; width: 20px;" alt="logout">
+        <span style="margin-left: 10px;" >Wallet</span>
+    </div>
+
+    <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;" onclick="goToMyOrders()">
+        <img onclick="goToMyOrders()" src="myOrdersImage.png" style="height: 20px; width: 20px;" alt="logout">
+        <span style="margin-left: 10px;" >My Orders</span>
+    </div>
+
+    <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;" onclick="goToCart()">
+        <img onclick="goToCart()" src="cartImage.png" style="height: 20px; width: 20px;" alt="logout">
+        <span style="margin-left: 10px;" >My Cart</span>
+    </div>
+    </div>
+    </div>
+    
+     <div style="display: flex; background-color: white; height: 70px; align-content: center; position: fixed; bottom: 0px; width: 100%; justify-content: space-between; " >
+    <img onclick="goToWallet()" src="walletImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+         <img onclick="goToMyOrders()" src="myOrdersImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+    <img onclick="goToCart()" src="cartImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px; ">
+    <img style="height: 50px;width: 50;  margin-top: 10px;" class="topBarImg" src="menuImage.png" alt="sad" onclick="openMenu()">
+
+</div> 
+<div>
+    
+    <div id="topBar">
+        <div class="topBarH4Div" >
+        <span>eekh</span>
+    </div>
+    <!-- <div class="topBarImgDiv" >
+         <img class="topBarImg" src="menuImage.png" alt="sad">
+    </div> -->
+</div>
+
+    <section class="slider_container">
+        <section class="slider">
+          <div class="slide one">
+            
+                   <div class="sliderImageAll" >
+    
+                   <div class="sliderImage1" >
+                   <img class="myImage1" src="cake1.jpeg" alt="image" style="width:80px;  height: 80px; border-style: solid; border-width: 5; animation: b 1s infinite;">
+                   </div>
+                   <div id="off">
+              <big><big><u><span>*Rs.100 off*</span></u></big></big>
+                   </div>
+                   <div class="sliderImage2" >
+                   <img class="myImage2" src="cake1.jpeg" alt="image" style="width:80px;  height: 80px; border-style: solid; border-width: 5; animation: b 1s infinite;">
+           </div>
+           
+          </div>
+                   <div id="aDiv">
+                     <big style="color: #fefefe;" >Please Fill the Below Feilds You will get</big>
+                         </div>
+          </div>
+          <div class="slide two">
+            <img src="coffeeSlider.png" alt="" />
+            <span class="caption"> slide two </span>
+          </div>
+          <div class="slide three">
+            <img src="cake14.jpg" alt="" />
+            <span class="caption"> slide three </span>
+          </div>
+          <div class="slide four">
+            <img src="cake17.jpg" alt="" />
+            <span class="caption"> slide four </span>
+          </div>
+          <div class="slide four">
+            <img src="cake26.jpg" alt="" />
+            <span class="caption"> slide five </span>
+          </div>
+        </section>
+      </section>
+    
+    
+    
+    
+    
+    
+          <script>
+            const images1 = ['cake1.jpeg','cake2.jpeg','cake3.jpeg', 'cake4.jpeg', 'cake5.jpeg']
+            const images2 = ['cake2.jpeg','cake3.jpeg','cake4.jpeg', 'cake5.jpeg', 'cake1.jpeg']
+              let currentIndex1 = 0;
+              let currentIndex2 = 0;
+    
+              function changeImage(){
+                const imgs1 = document.querySelectorAll('.myImage1');
+                const imgs2 = document.querySelectorAll('.myImage2');
+                currentIndex1 = (currentIndex1 + 1) % images1.length;
+                currentIndex2 = (currentIndex2 + 1) % images2.length;
+                imgs1.forEach(img => img.src = images1[currentIndex1]);
+                imgs2.forEach(img => img.src = images2[currentIndex2]);
+                
+              }
+    
+              setInterval(changeImage, 1000)
+          </script>
+    
+
+
+    <div class="container">
+        <span style="font-size: 20px; font-weight: 700;" id="welcome-message">Loading...</span>
+        
+
+        <form id="info-form">
+            <div class="textAndInput" >
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="date" id="dob" required placeholder="Please Enter Date Of Birth">
+            </div>
+            <button style="margin-bottom: 5px;" type="submit">Submit</button>
+        </form>
+            <span style="font-size: 15px; font-weight: bold;" id="welcome-referral">Loading...</span>
+        <div class="record">
+            <div class="nameRecordAndDobRecord" >
+           
+            <span style="width: 175px; font-size: 18px; font-weight: bolder;height: 20px;" class="nameRecord" >Name</span>
+            <span style="width: 175px; font-size: 18px; font-weight: bolder;height: 20px;" class="dobRecord" >DOB</span>
+            
+            </div>
+            <div class="allRecords" >
+            <div style=" color: green; font-size: 20px; font-weight: 700;" id="recordsListName">Loading...</div>
+            
+            <div style=" color: green; font-size: 20px; font-weight: 700;" id="recordsListDob">Loading...</div>
+        </div>
+    </div>
+       
+
+
+        <div id="message"></div>
+        <hr>
+        <p><u><b>Our Servings</b></u></p>
+        <hr>
+        <pre><b>1.  <a href="cake.html">Cake</a></b></pre>
+        <pre><b>2.  <a href="pizza.html">Pizza</a></b></pre>
+        <pre><b>3.  <a href="index.html">Ice Cream</a></b></pre>
+        <pre><b>4.  <a href="index.html">Cold Coffee</a></b></pre>
+    
+
+    <hr>
+   
+    
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeresetmodal">&times;</span>
+            <h2>Reset Password</h2>
+            <input type="text" id="reset-mobile" placeholder="Enter your registered mobile number" required>
+            <button id="sendOtpButton">Send OTP</button>
+
+            <div id="otpSection" style="display:none;">
+                <input type="text" id="otp" placeholder="Enter OTP" required>
+                <button id="verifyotp">Verify OTP</button>
+            </div>
+
+            <div id="newPasswordSection" style="display:none;">
+                <input type="password" id="new-password" placeholder="Enter new password" required>
+                <button id="resetpassword">Reset Password</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <div class="menu-container">
+        <div class="a" >
+        <!-- Row 1 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item1">
+                <img src="cake1.jpeg" alt="Black Forest 1 Pound">
+                <span>Black Forest 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls1" class="quantity-controls">
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity1')">-</button>
+                    <input type="number" id="quantity1" value="1" min="1">
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity1')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Black Forest 1 Pound', 280, 'cake1.jpeg', 'quantity1')" id="add-to-cart1">Add to Cart</button>  <div id="message1" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item2">
+                <img src="cake2.jpeg" alt="Light Chocolate 1 Pound">
+                <span>Light Chocolate 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls2" class="quantity-controls">
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity2')">-</button>
+                    <input type="number" id="quantity2" value="1" min="1">
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity2')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Light Chocolate 1 Pound', 280, 'cake2.jpeg', 'quantity2')" id="add-to-cart2">Add to Cart</button> <div id="message2" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+    </div>
+    <div class="a" >
+        <!-- Row 3 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item3">
+                <img src="cake3.jpeg" alt="Truffle 1 Pound">
+                <span>Truffle 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls3" class="quantity-controls">
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity3')">-</button>
+                    <input type="number" id="quantity3" value="1" min="1">
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity3')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Truffle 1 Pound', 280, 'cake3.jpeg', 'quantity3')" id="add-to-cart3">Add to Cart</button> <div id="message3" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="menu-row">
+            <div class="menu-item" id="item4">
+                <img src="cake4.jpeg" alt="Pinnapple 1 Pound">
+                <span>Pinnapple 1 Pound</span>
+                <span style="color: green;">Rs.280</span>
+                <div id="quantity-controls4" class="quantity-controls">
+                    <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity4')">-</button>
+                    <input type="number" id="quantity4" value="1" min="1">
+                    <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity4')">+</button>
+                </div>
+                <button onclick="handleAddToCart('Pinnapple 1 Pound', 280, 'cake4.jpeg', 'quantity4')" id="add-to-cart4">Add to Cart</button>  <div id="message4" class="message hidden">Item added to cart</div>
+            </div>
+        </div>
+
+         <!-- Row 5 -->
+         
+    </div>  
+    <div class="a">
+    <div class="menu-row">
+        <div class="menu-item" id="item5">
+            <img src="strawberry1Pound.jpg" alt="Strawberry 1 Pound">
+            <span>Strawberry 1 Pound</span>
+            <span style="color: green;">Rs.280</span>
+            <div id="quantity-controls5" class="quantity-controls">
+                <button class="quantityControlButtonSub" onclick="decreaseQuantity('quantity5')">-</button>
+                <input type="number" id="quantity5" value="1" min="1">
+                <button class="quantityControlButtonAdd" onclick="increaseQuantity('quantity5')">+</button>
+            </div>
+            <button onclick="handleAddToCart('Strawberry 1 Pound', 280, 'strawberry1Pound.jpg', 'quantity5')" id="add-to-cart5">Add to Cart</button> 
+        </div>
+    </div>
+</div>
+    </div>
+
+    <button class="cart-button" onclick="goToCart()">Go to Cart</button>
+
+</div>
+
+
+</div>
+
+    <!-- Button to open the Reset Password Modal -->
+    
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, doc, getDoc, addDoc, collection, getDocs, updateDoc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+        import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        
+        // Get query parameters
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+        
+        // function go(){
+        //     window.location.href = `Menu.html?mobile=${encodeURIComponent(mobile)}`;
+        // }
+        // window.go = go;
+        if (mobile) {
+            const userRef = doc(db, 'users', mobile);
+            const docSnap = await getDoc(userRef);
+
+            const welcomeMessage = document.getElementById('welcome-message');
+            const welcomereferral = document.getElementById('welcome-referral');
+            const nameInput = document.getElementById('name');
+            const dobInput = document.getElementById('dob');
+            const recordsListName = document.getElementById('recordsListName');
+            const recordsListDob = document.getElementById('recordsListDob');
+
+            if (docSnap.exists()) {
+                const userData = docSnap.data();
+                const userName = userData.name;
+                const userReferral = userData.referralPhoneNumber;
+
+                welcomeMessage.textContent = `Welcome, ${userName}!`;
+                welcomereferral.textContent = `Referred By, ${userReferral}!`;
+            } else {
+                welcomeMessage.textContent = 'User not found!';
+            }
+
+            // Handle form submission
+            const infoForm = document.getElementById('info-form');
+            infoForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = nameInput.value;
+                const dob = dobInput.value;
+
+                try {
+                    // Add new record to Firestore under a subcollection for the user
+                    const docRef = await addDoc(collection(db, 'users', mobile, 'records'), {
+                        name: name,
+                        dob: dob
+                    });
+
+                    console.log('Document written with ID: ', docRef.id);
+
+                    // Refresh the records list
+                    fetchRecords();
+                } catch (e) {
+                    console.error('Error adding document: ', e);
+                }
+            });
+
+            // Function to fetch and display all records
+            async function fetchRecords() {
+                recordsListName.innerHTML = 'Loading...';
+                recordsListDob.innerHTML = 'Loading...'; // Show loading text
+
+                try {
+                    const snapshot = await getDocs(collection(db, 'users', mobile, 'records'));
+                    recordsListName.innerHTML = ''; // Clear loading text
+                    recordsListDob.innerHTML = '';
+
+                    if (snapshot.empty) {
+                        recordsListName.textContent = 'No records found.';
+                        recordsListDob.textContent = 'No records found.';
+                    } else {
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            const lineBreak = document.createElement('br');
+                            const recordElementName = document.createElement('div');
+                            const recordElementDob = document.createElement('div');
+                            recordElementName.textContent = `${data.name}`;
+                            recordElementDob.innerHTML = `${data.dob}`;
+                            recordsListName.appendChild(recordElementName);
+                            recordsListDob.appendChild(recordElementDob);
+                            // recordsListName.style.backgroundColor ='lightblue'
+                            // recordsListDob.style.backgroundColor ='seagreen'
+
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error fetching records: ', e);
+                    recordsListName.textContent = 'Failed to load records.';
+                    recordsListDob.textContent = 'Failed to load records.';
+                }
+            }
+
+            // Fetch and display records on page load
+            fetchRecords();
+        } else {
+            alert('User not found.');
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        async function syncMenuItemQuantities() {
+    const cartRef = collection(db, 'users', mobile, 'cart');
+    const querySnapshot = await getDocs(cartRef);
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const itemId = data.itemName.replace(' ', '').toLowerCase();
+        const quantityInput = document.getElementById(`quantity${itemId}`);
+        if (quantityInput) {
+            quantityInput.value = data.quantity;
+        }
+    });
+}
+
+
+
+       async function loadCartData() {
+    console.log("Loading cart data...");
+    // Get the cart collection reference
+    const cartRef = collection(db, 'users', mobile, 'cart');
+    
+    try {
+        // Get the cart data from the database
+        const querySnapshot = await getDocs(cartRef);
+        console.log("Cart query snapshot:", querySnapshot);
+
+        // Create an object to store the cart items
+        const cartItems = {};
+        // Loop through the cart data and store the item name and quantity in the cartItems object
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            console.log(`Cart item found: ${data.itemName} with quantity ${data.quantity}`);
+            cartItems[data.itemName] = data.quantity;
+        });
+
+        console.log("Cart items loaded:", cartItems);
+
+        // Loop through the cart items and update the UI
+        Object.keys(cartItems).forEach(itemName => {
+            const itemId = getItemIdByName(itemName);
+            if (itemId) {
+                const quantity = cartItems[itemName];
+                console.log(`Updating UI for item ${itemName} with quantity ${quantity}`);
+                const quantityInput = document.getElementById(`quantity${itemId}`);
+                const quantityControls = document.getElementById(`quantity-controls${itemId}`);
+                const addToCartButton = document.getElementById(`add-to-cart${itemId}`);
+
+                if (quantityInput && quantityControls && addToCartButton) {
+                    quantityInput.value = quantity;
+                    quantityControls.style.visibility = 'visible';
+                    quantityControls.style.display = 'flex';
+                    addToCartButton.classList.add('hidden');
+                } else {
+                    console.error(`UI elements not found for itemId ${itemId}`);
+                }
+            } else {
+                console.error(`Item ID not found for itemName ${itemName}`);
+            }
+        });
+    } catch (error) {
+        console.error("Error loading cart data:", error);
+    }
+}
+
+// Get item ID by name
+function getItemIdByName(itemName) {
+    const items = {
+        'Black Forest 1 Pound': 1,
+        'Light Chocolate 1 Pound': 2,
+        'Truffle 1 Pound': 3,
+        'Pinnapple 1 Pound': 4,
+        'Strawberry 1 Pound': 5,
+        'Blueberry 1 Pound': 6,
+        'Lemon 1 Pound': 7,
+        'Mango 1 Pound': 8,
+        'Peach 1 Pound': 9,
+        'Watermelon 1 Pound': 10,
+        'Orange 1 Pound': 11,
+        'Apple 1 Pound': 12,
+    };
+    return items[itemName];
+}
+
+// Handle adding item to cart
+
+window.handleAddToCart = async function (itemName, itemPrice, itemImage, quantityId) {
+    try {
+        // Check if the item already exists in the cart
+        const cartRef = collection(db, 'users', mobile, 'cart');
+        const querySnapshot = await getDocs(cartRef);
+
+        let itemExists = false;
+        for (const doc of querySnapshot.docs) {
+            const data = doc.data();
+            if (data.itemName === itemName) {
+                itemExists = true;
+                // Update the UI to show the quantity controls with the quantity from the cart
+                document.getElementById(`quantity-controls${getItemIdByName(itemName)}`).style.visibility = 'visible';
+                document.getElementById(`quantity-controls${getItemIdByName(itemName)}`).style.display = 'flex';
+                document.getElementById(`quantity-controls${getItemIdByName(itemName)}`).value = data.quantity;
+                break;
+            }
+        }
+
+        // If the item does not exist, add it with quantity 1
+        if (!itemExists) {
+            await addDoc(cartRef, {
+                itemName,
+                itemPrice,
+                quantity: '1', // Set the initial quantity to 1
+                itemImage
+            });
+            // Update the UI to show the quantity controls
+            document.getElementById(`quantity-controls${getItemIdByName(itemName)}`).style.visibility = 'visible';
+            document.getElementById(`quantity-controls${getItemIdByName(itemName)}`).style.display = 'flex';
+        }
+
+        // Update UI
+        const itemId = getItemIdByName(itemName);
+        if (itemId) {
+            document.getElementById(`add-to-cart${itemId}`).classList.add('hidden');
+        } else {
+            console.error(`Item ID not found for itemName ${itemName}`);
+        }
+    } catch (error) {
+        console.error("Error adding item to cart:", error);
+    }
+}
+
+// Increase quantity
+window.increaseQuantity = async function (quantityId) {
+    try {
+        console.log(`Increasing quantity for ${quantityId}`);
+        const input = document.getElementById(quantityId);
+        const newQuantity = parseInt(input.value) + 1;
+        input.value = newQuantity;
+        await updateCartQuantity(quantityId, newQuantity);
+        console.log(`Increased quantity to ${newQuantity}`);
+    } catch (error) {
+        console.error("Error increasing quantity:", error);
+    }
+};
+
+// Decrease quantity
+window.decreaseQuantity = async function (quantityId) {
+    try {
+        console.log(`Decreasing quantity for ${quantityId}`);
+        const itemId = quantityId.slice(-1);
+        const input = document.getElementById(quantityId);
+        const newQuantity = parseInt(input.value) - 1;
+
+        if (newQuantity > 0) {
+            input.value = newQuantity;
+            await updateCartQuantity(quantityId, newQuantity);
+            console.log(`Decreased quantity to ${newQuantity}`);
+        } else if (newQuantity === 0) {
+            // Remove the item from the cart
+            const itemName = document.querySelector(`#item${itemId} span`).innerText;
+            const cartRef = collection(db, 'users', mobile, 'cart');
+            const querySnapshot = await getDocs(cartRef);
+
+            for (const doc of querySnapshot.docs) {
+                const data = doc.data();
+                if (data.itemName === itemName) {
+                    await deleteDoc(doc.ref); // Remove the document from the cart collection
+                    console.log(`Removed item from cart: ${itemName}`);
+                    break;
+                }
+            }
+
+            // Hide quantity controls and show 'Add to Cart' button
+            document.getElementById(`add-to-cart${itemId}`).classList.remove('hidden');
+            document.getElementById(`quantity-controls${itemId}`).style.visibility = 'hidden';
+            document.getElementById(`quantity-controls${itemId}`).style.display = 'none';
+        }
+    } catch (error) {
+        console.error("Error decreasing quantity:", error);
+    }
+};
+
+// Update cart quantity
+async function updateCartQuantity(quantityId, quantity) {
+    try {
+        console.log(`Updating cart quantity for ${quantityId} to ${quantity}`);
+        const itemId = quantityId.slice(-1);
+        const itemName = document.querySelector(`#item${itemId} span`).innerText;
+        const itemImage = document.querySelector(`#item${itemId} img`).src;
+
+        const cartRef = collection(db, 'users', mobile, 'cart');
+        const querySnapshot = await getDocs(cartRef);
+
+        let itemExists = false;
+
+        for (const doc of querySnapshot.docs) {
+            const data = doc.data();
+            if (data.itemName === itemName) {
+                itemExists = true;
+                await setDoc(doc.ref, {
+                    ...data,
+                    quantity: quantity.toString(),
+                    itemImage
+                });
+                console.log(`Updated cart quantity for item: ${itemName}, new quantity: ${quantity}`);
+                break;
+            }
+        }
+
+        if (!itemExists) {
+            console.error("Item not found in cart.");
+        }
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+    }
+}
+
+// Initialize on page load
+
+// Navigation functions
+function goToCart() {
+    window.location.href = `Cart.html?mobile=${mobile}`;
+}
+function goToWallet() {
+    window.location.href = `wallet.html?mobile=${mobile}`;
+}
+function goToMyOrders() {
+    window.location.href = `myOrders.html?mobile=${mobile}`;
+}
+function goToIndex() {
+    window.location.href = `index.html?`;
+}
+
+//This function opens the right menu bar
+function openMenu() {
+    //Get the right menu bar element
+    const rightMenuBar = document.getElementById('rightMenuBar');
+    //Set the visibility of the right menu bar to visible
+    rightMenuBar.style.visibility = 'visible';
+
+    
+    // if (rightMenuBar.style.visibility === 'hidden' || rightMenuBar.style.visibility === '') {
+    //     rightMenuBar.style.visibility = 'visible';
+    //     rightMenuBar.style.animation = 'rightMenuBarAnimation 0.5s ease-out forwards';
+    // } else {
+    //     rightMenuBar.style.visibility = 'hidden';
+    // }
+}
+function closeMenu() {
+    const rightMenuBar = document.getElementById('rightMenuBar');
+    rightMenuBar.style.visibility = 'hidden';
+}
+
+window.onload = (loadCartData())
+   
+window.onload = (syncMenuItemQuantities())
+    
+// Expose functions globally
+window.goToCart = goToCart;
+window.openMenu = openMenu;
+window.closeMenu = closeMenu;
+window.goToIndex = goToIndex;
+window.goToMyOrders = goToMyOrders;
+window.goToWallet = goToWallet;
+
+
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

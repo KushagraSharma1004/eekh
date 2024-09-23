@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add New Item</title>
+    <style>
+      .menu-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        padding-bottom: 0px;
+      }
+      .menu-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0px;
+      }
+      .menu-item {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 5px;
+        padding: 15px;
+        width: 170px;
+        text-align: center;
+      }
+      .menu-item img {
+        border-radius: 10%;
+        width: 100%;
+        height: auto;
+      }
+      .menu-item span {
+        display: block;
+        margin: 10px 0;
+        font-size: 16px;
+      }
+      .menu-item button {
+        background-color: blue;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 5px;
+        width: 105px;
+      }
+
+      .cart-button {
+        margin-top: 5;
+        margin-bottom: 65px;
+        width: 100%;
+        background-color: orange;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-size: 18px;
+        border: none;
+        border-radius: 5px 5px 0 0;
+        cursor: pointer;
+      }
+      .cart-button:hover {
+        background-color: darkorange;
+      }
+      .message {
+        color: green;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 0px;
+      }
+      .hidden {
+        display: none;
+      }
+
+      #addItemButton {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        margin-top: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #dummyItem {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="menu-container" id="menuContainer">
+      <!-- Existing items will be dynamically inserted here -->
+
+      <button id="addItemButton" onclick="addItem()">Add +</button>
+
+      <div id="dummyItem">
+        <div class="menu-row">
+          <div class="menu-item" id="newItem">
+            <img id="dummyImage" src="placeholder.jpg" alt="New Item" />
+
+            <input type="file" id="newItemImage" accept="image/*" />
+            <input id="newItemName" placeholder="Item Name" />
+            <input
+              id="newItemPrice"
+              style="color: green"
+              placeholder="Item Price"
+            />
+
+            <button onclick="doneItem()">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      // Initialize Firebase
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+      import {
+        getFirestore,
+        collection,
+        getDocs,
+        doc,
+        setDoc,
+        deleteDoc,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+        authDomain: "eekh-website.firebaseapp.com",
+        databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+        projectId: "eekh-website",
+        storageBucket: "eekh-website.appspot.com",
+        messagingSenderId: "276234231567",
+        appId: "1:276234231567:web:1509267f60d97a83cea87a",
+        measurementId: "G-QX5HCKXMDK",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      async function fetchMenuItems() {
+        const menuContainer = document.getElementById("menuContainer");
+        const querySnapshot = await getDocs(collection(db, "menu-items"));
+
+        querySnapshot.forEach((doc) => {
+          const itemData = doc.data();
+          const itemElement = document.createElement("div");
+          itemElement.className = "menu-row";
+          itemElement.innerHTML = `
+                    <div class="menu-item">
+                        <img src="${itemData.image}" alt="${itemData.name}">
+                        <span>${itemData.name}</span>
+                        <span style="color: green;">${itemData.price}</span>
+                        <button onclick="deleteExistingItem('${doc.id}')">Delete</button>
+                        <button onclick="editExistingItem('${doc.id}', '${itemData.name}', ${itemData.price})">Edit</button>
+                    </div>
+                `;
+          menuContainer.insertBefore(itemElement, menuContainer.firstChild);
+        });
+      }
+
+      function addItem() {
+        document.querySelector("#dummyItem").style.display = "block";
+
+        const newItemImageInput = document.getElementById("newItemImage");
+        const dummyImage = document.getElementById("dummyImage");
+
+        newItemImageInput.addEventListener("change", (e) => {
+          const file = newItemImageInput.files[0];
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            const imageDataUrl = reader.result;
+            dummyImage.src = imageDataUrl;
+          };
+
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function doneItem(docRef) {
+        const itemName = document.getElementById("newItemName").value;
+        const itemPrice = document.getElementById("newItemPrice").value;
+        const itemImage = document.getElementById("dummyImage").src;
+
+        if (!itemName || !itemPrice || !itemImage) {
+          alert("Please fill out all fields.");
+          return;
+        }
+
+        const newItem = {
+          name: itemName,
+          price: parseFloat(itemPrice),
+          image: itemImage,
+          quantityControlsId: Math.random(),
+          quantityControlsInputId: Math.random(),
+          addToCartButtonId:  Math.random()
+        };
+
+        try {
+          await setDoc(doc(db, "menu-items", itemName), newItem);
+          console.log("Item added successfully!"); // Hide and reset the dummy item fields
+
+          document.getElementById("newItemName").value = "";
+          document.getElementById("newItemPrice").value = "";
+          document.getElementById("dummyImage").src = "placeholder.jpg";
+          document.querySelector("#dummyItem").style.display = "none"; // Refresh the list of items
+
+          document.getElementById("menuContainer").innerHTML = "";
+          fetchMenuItems();
+        } catch (error) {
+          console.error("Error adding item: ", error);
+        }
+        //   location.reload();
+      }
+
+      async function deleteExistingItem(itemId) {
+        try {
+          await deleteDoc(doc(db, "menu-items", itemId));
+          console.log("Item deleted successfully!");
+
+          // Refresh the list of items
+          document.getElementById("menuContainer").innerHTML = "";
+          fetchMenuItems();
+        } catch (error) {
+          console.error("Error deleting item: ", error);
+        }
+        location.reload();
+      }
+
+      async function editExistingItem(itemId, currentName, currentPrice) {
+        const newName = prompt("Enter new name:", currentName);
+        const newPrice = prompt("Enter new price:", currentPrice);
+
+        if (newName !== null && newPrice !== null) {
+          try {
+            await updateDoc(doc(db, "menu-items", itemId), {
+              name: newName,
+              price: parseFloat(newPrice),
+            });
+            console.log("Item updated successfully!");
+
+            // Refresh the list of items
+            document.getElementById("menuContainer").innerHTML = "";
+            fetchMenuItems();
+          } catch (error) {
+            console.error("Error updating item: ", error);
+          }
+        }
+        location.reload();
+      }
+
+      window.addItem = addItem;
+      window.doneItem = doneItem;
+      window.deleteExistingItem = deleteExistingItem;
+      window.editExistingItem = editExistingItem;
+
+      // Fetch and display existing items on page load
+      fetchMenuItems();
+    </script>
+  </body>
+</html>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add New Item</title>
+  <style>
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      padding-bottom: 0px;
+    }
+
+    .menu-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0px;
+    }
+
+    .menu-item {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: 5px;
+      padding: 15px;
+      width: 170px;
+      text-align: center;
+    }
+
+    .menu-item img {
+      border-radius: 10%;
+      width: 100%;
+      height: auto;
+    }
+
+    .menu-item span {
+      display: block;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .menu-item button {
+      background-color: blue;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 5px;
+      width: 105px;
+    }
+
+    .cart-button {
+      margin-top: 5px;
+      margin-bottom: 65px;
+      width: 100%;
+      background-color: orange;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+    }
+
+    .cart-button:hover {
+      background-color: darkorange;
+    }
+
+    .message {
+      color: green;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 0px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #addItemButton {
+      width: 100%;
+      background-color: #4caf50;
+      color: white;
+      padding: 14px 20px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #dummyItem {
+      margin-top: 30px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="addItemButton" onclick="addItem()">Add +</button>
+  <div id="dummyItem">
+    <div class="menu-row">
+      <div class="menu-item" id="newItem">
+        <img id="dummyImage" src="imageNotAvailable.png" alt="New Item" />
+        <input type="file" id="newItemImage" accept="image/*" />
+        <input id="newItemName" placeholder="Item Name" />
+        <input id="newItemPrice" style="color: green" placeholder="Item Price" type="number" />
+        <select name="Category" id="Category">
+          <option value="">Select Category</option>
+          <option value="Cake">Cake</option>
+          <option value="Pizza">Pizza</option>
+          <option value="Ice-cream">Ice-cream</option>
+          <option value="Ice-cubes">Ice-cubes</option>
+          <option value="Birthday-Accessories">Birthday Accessories</option>
+        </select>
+        <select name="subCategory" id="subCategory">
+          <option value="">Select Subcategory</option>
+        </select>
+        <button id="doneButton" onclick="doneItem()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const categorySubcategories = {
+        "Cake": [
+          "Cake 1 Pound",
+          "Cake 2 Pound",
+          "Layer Cake",
+          "Kids Cake",
+          "Photo Cake",
+          "Designer Cake"
+        ],
+        "Pizza": [
+          "OTC Pizza",
+          "SweetCorn Pizza"
+        ],
+        "Ice-cream": [
+          "Ice-cream Cup",
+          "Ice-cream Pack",
+          "Ice-cream Brick"
+        ],
+        "Ice-cubes": [
+          "Ice-cubes"
+        ],
+        "Birthday-Accessories": [
+          "Birthday-Accessories"
+        ]
+      };
+
+      const categorySelect = document.getElementById('Category');
+      const subCategorySelect = document.getElementById('subCategory');
+
+      categorySelect.addEventListener('change', function () {
+        const selectedCategory = this.value;
+        updateSubCategoryOptions(selectedCategory);
+      });
+
+      function updateSubCategoryOptions(category) {
+        // Clear existing options
+        subCategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+
+        // Populate new options based on selected category
+        if (category && categorySubcategories[category]) {
+          categorySubcategories[category].forEach(subCategory => {
+            const option = document.createElement('option');
+            option.value = subCategory;
+            option.textContent = subCategory;
+            subCategorySelect.appendChild(option);
+          });
+        }
+      }
+    });
+  </script>
+
+  <div class="menu-container" id="menuContainer">
+    <!-- Existing items will be dynamically inserted here -->
+  </div>
+
+  <script type="module">
+    // Initialize Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      setDoc,
+      deleteDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+      authDomain: "eekh-website.firebaseapp.com",
+      databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+      projectId: "eekh-website",
+      storageBucket: "eekh-website.appspot.com",
+      messagingSenderId: "276234231567",
+      appId: "1:276234231567:web:1509267f60d97a83cea87a",
+      measurementId: "G-QX5HCKXMDK",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchMenuItems() {
+      const menuContainer = document.getElementById("menuContainer");
+      const querySnapshot = await getDocs(collection(db, "menu-items"));
+
+      querySnapshot.forEach((doc) => {
+        const itemData = doc.data();
+        const itemElement = document.createElement("div");
+        itemElement.className = "menu-row";
+        itemElement.innerHTML = `
+          <div class="menu-item">
+            <img src="${itemData.image}" alt="${itemData.name}">
+            <span>${itemData.name}</span>
+            <span style="color: green;">${itemData.price}</span>
+            <span>${itemData.category}</span>
+            <span>${itemData.subCategory}</span>
+            <button onclick="deleteExistingItem('${doc.id}')">Delete</button>
+            <button onclick="editExistingItem('${doc.id}', '${itemData.name}', ${itemData.price})">Edit</button>
+          </div>
+        `;
+        menuContainer.insertBefore(itemElement, menuContainer.firstChild);
+      });
+    }
+
+    function addItem() {
+      document.querySelector("#dummyItem").style.display = "block";
+
+      const newItemImageInput = document.getElementById("newItemImage");
+      const dummyImage = document.getElementById("dummyImage");
+
+      newItemImageInput.addEventListener("change", (e) => {
+        const file = newItemImageInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            const imageDataUrl = reader.result;
+            convertToJPEG(imageDataUrl).then((jpegDataUrl) => {
+              dummyImage.src = jpegDataUrl;
+            });
+          };
+
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    async function convertToJPEG(dataUrl) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = dataUrl;
+
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const jpegDataUrl = canvas.toDataURL("image/jpeg");
+          resolve(jpegDataUrl);
+        };
+      });
+    }
+
+    async function doneItem() {
+      let itemName = document.getElementById("newItemName").value.trim();
+      const itemPrice = document.getElementById("newItemPrice").value.trim();
+      const itemImage = document.getElementById("dummyImage").src;
+
+      if (!itemName || !itemPrice || !itemImage) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      // Replace spaces with hyphens in the item name
+      itemName = itemName.replace(/\s+/g, '-');
+
+      const newItem = {
+        name: itemName,
+        price: parseFloat(itemPrice),
+        image: itemImage,
+        category: document.getElementById("Category").value,
+        subCategory: document.getElementById("subCategory").value
+      };
+
+      try {
+        await setDoc(doc(db, "menu-items", itemName), newItem);
+        console.log("Item added successfully!");
+
+        // Hide and reset the dummy item fields
+        document.getElementById("newItemName").value = "";
+        document.getElementById("newItemPrice").value = "";
+        document.getElementById("dummyImage").src = "imageNotAvailable.png";
+        document.querySelector("#dummyItem").style.display = "none";
+        document.getElementById("menuContainer").innerHTML = "";
+        fetchMenuItems();
+      } catch (error) {
+        console.error("Error adding item: ", error);
+      }
+    }
+
+    async function deleteExistingItem(itemId) {
+      try {
+        await deleteDoc(doc(db, "menu-items", itemId));
+        console.log("Item deleted successfully!");
+        document.getElementById("menuContainer").innerHTML = "";
+        fetchMenuItems();
+      } catch (error) {
+        console.error("Error deleting item: ", error);
+      }
+    }
+
+    async function editExistingItem(itemId, currentName, currentPrice) {
+      const newName = prompt("Enter new name:", currentName);
+      const newPrice = prompt("Enter new price:", currentPrice);
+
+      if (newName !== null && newPrice !== null) {
+        try {
+          await updateDoc(doc(db, "menu-items", itemId), {
+            name: newName,
+            price: parseFloat(newPrice),
+          });
+          console.log("Item updated successfully!");
+          document.getElementById("menuContainer").innerHTML = "";
+          fetchMenuItems();
+        } catch (error) {
+          console.error("Error updating item: ", error);
+        }
+      }
+    }
+    window.addItem = addItem;
+    window.doneItem = doneItem;
+    window.deleteExistingItem = deleteExistingItem;
+    window.editExistingItem = editExistingItem;
+
+    // Load existing menu items on page load
+    fetchMenuItems();
+  </script>
+</body>
+
+</html>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Item</title>
+  <style>
+    * {
+      font-family: Comic Sans MS;
+    }
+
+    /* body {}
+
+    html {
+       font-size: 2px; 
+    } */
+
+    .menu-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      padding-bottom: 0px;
+    }
+
+    .menu-category {
+      margin-bottom: 20px;
+      width: 100%;
+    }
+
+    .menu-category h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .menu-row {
+      display: flex;
+      overflow-x: auto;
+      /* Enable horizontal scrolling */
+      padding: 10px 0;
+      white-space: nowrap;
+      /* Prevent items from wrapping */
+      margin-bottom: 10px;
+      /* Spacing between rows */
+      position: relative;
+    }
+
+    .menu-row h3 {
+      position: absolute;
+      top: -20px;
+      left: 0;
+      position: sticky;
+    }
+
+
+
+    .menu-item {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: 5px;
+      padding: 15px;
+      width: 150px;
+      text-align: center;
+      display: inline-block;
+      /* Ensure items are inline for horizontal scrolling */
+      /* height: 250px; */
+    }
+
+    .menu-item img {
+      border-radius: 10%;
+      width: 100%;
+      height: 130px;
+    }
+
+    .menu-item span {
+      display: block;
+      margin: 2px 0;
+      font-size: 16px;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    .menu-item-delete-button,
+    .menu-item-edit-button {
+      font-family: Comic Sans MS;
+      background-color: red;
+      color: white;
+      border: none;
+      text-align: center;
+      /* padding: 8px 12px; */
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      /* margin-top: 5px; */
+      width: calc(45%);
+      display: inline-block;
+      height: 32px;
+    }
+
+    .menu-item-edit-button {
+      background-color: hsl(60, 100%, 50%);
+      color: black;
+    }
+
+    .menu-item-buttons {
+      display: flex;
+      justify-content: space-evenly;
+      margin-top: 5px;
+    }
+
+    .cart-button {
+      /* margin-top: 5px; */
+      margin-bottom: 65px;
+      width: 100%;
+      background-color: hsl(39, 100%, 50%);
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+    }
+
+    .cart-button:hover {
+      background-color: darkorange;
+    }
+
+    .message {
+      color: green;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 0px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #addItemButton {
+      width: 100%;
+      background-color: #4caf50;
+      color: white;
+      padding: 14px 20px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #dummyItem {
+      margin-top: 30px;
+      display: none;
+    }
+
+    #dummyItem img {
+      border-radius: 10%;
+      width: 100%;
+      height: 130px;
+    }
+
+    #dummyItem input {
+      margin-top: 2px;
+      height: 25px;
+      width: 90%;
+    }
+
+    #dummyItem select {
+      margin-top: 2px;
+      height: 25px;
+      width: 100%;
+    }
+
+    .file-input-container {
+      width: 71%;
+    }
+
+    .file-input-container input[type="file"] {
+      display: none;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .file-input-label {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #newItem {
+      display: flex;
+      flex-direction: column;
+      /* align-items: center; */
+      /* height: 100%; */
+    }
+
+    .menu-subcategory {
+      display: flex;
+      flex-direction: column;
+      /* align-items: center;
+      height: 100%; */
+    }
+  </style>
+</head>
+
+<body>
+  <button id="addItemButton" onclick="addItem()">Add +</button>
+  <div id="dummyItem">
+    <div class="menu-row">
+      <div class="menu-item" id="newItem">
+        <img id="dummyImage" src="imageNotAvailable.png" alt="New Item" />
+        <div class="file-input-container">
+          <label for="newItemImage" class="file-input-label">Choose Image</label>
+          <input type="file" id="newItemImage" accept="image/*" />
+        </div>
+        <input id="newItemName" placeholder="Item Name" />
+        <input id="newItemPrice" style="color: green" placeholder="Item Price" type="number" />
+        <select name="Category" id="Category">
+          <option value="">Select Category</option>
+          <option value="Cake">Cake</option>
+          <option value="Pizza">Pizza</option>
+          <option value="Ice-cream">Ice-cream</option>
+          <option value="Ice-cubes">Ice-cubes</option>
+          <option value="Birthday-Accessories">Birthday Accessories</option>
+
+        </select>
+        <select name="subCategory" id="subCategory">
+          <option value="">Select Subcategory</option>
+        </select>
+        <textarea id="newItemDescription" placeholder="Item Description" type="text"></textarea>
+        <button id="doneButton" onclick="doneItem()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const categorySubcategories = {
+        "Cake": [
+          "Cake 1 Pound",
+          "Cake 2 Pound",
+          "Layer Cake",
+          "Kids Cake",
+          "Photo Cake",
+          "Designer Cake"
+        ],
+        "Pizza": [
+          "OTC Pizza",
+          "SweetCorn Pizza"
+        ],
+        "Ice-cream": [
+          "Ice-cream Cup",
+          "Ice-cream Pack",
+          "Ice-cream Brick"
+        ],
+        "Ice-cubes": [
+          "Ice-cubes"
+        ],
+        "Birthday-Accessories": [
+          "Birthday-Accessories"
+        ]
+      };
+
+      const categorySelect = document.getElementById('Category');
+      const subCategorySelect = document.getElementById('subCategory');
+
+      categorySelect.addEventListener('change', function () {
+        const selectedCategory = this.value;
+        updateSubCategoryOptions(selectedCategory);
+      });
+
+      function updateSubCategoryOptions(category) {
+        // Clear existing options
+        subCategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+
+        // Populate new options based on selected category
+        if (category && categorySubcategories[category]) {
+          categorySubcategories[category].forEach(subCategory => {
+            const option = document.createElement('option');
+            option.value = subCategory;
+            option.textContent = subCategory;
+            subCategorySelect.appendChild(option);
+          });
+        }
+      }
+    });
+  </script>
+
+
+  <div class="menu-container" id="menuContainer">
+    <!-- Categories will be dynamically inserted here -->
+  </div>
+
+
+
+
+  <script type="module">
+    // Import Firebase app and Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      setDoc,
+      deleteDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+      authDomain: "eekh-website.firebaseapp.com",
+      databaseURL: "https://eekh-website-default-rtdb.firebaseio.com",
+      projectId: "eekh-website",
+      storageBucket: "eekh-website.appspot.com",
+      messagingSenderId: "276234231567",
+      appId: "1:276234231567:web:1509267f60d97a83cea87a",
+      measurementId: "G-QX5HCKXMDK",
+    };
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function fetchMenuItems() {
+      const menuContainer = document.getElementById("menuContainer");
+      const querySnapshot = await getDocs(collection(db, "menu-items"));
+
+      const categories = {};
+
+      querySnapshot.forEach((doc) => {
+        const itemData = doc.data();
+
+        if (!categories[itemData.category]) {
+          categories[itemData.category] = {};
+        }
+
+        if (!categories[itemData.category][itemData.subCategory]) {
+          categories[itemData.category][itemData.subCategory] = [];
+        }
+
+        categories[itemData.category][itemData.subCategory].push({ ...itemData, id: doc.id });
+      });
+
+      Object.keys(categories).forEach(category => {
+        const categoryDiv = document.createElement("div");
+        categoryDiv.className = "menu-category";
+        const categoryTitle = document.createElement("h2");
+        categoryTitle.textContent = category;
+        categoryDiv.appendChild(categoryTitle);
+
+        Object.keys(categories[category]).forEach(subCategory => {
+          // const mainSubCategoryDiv = document.createElement("div");
+          // mainSubCategoryDiv.className = "menu-subcategory";
+          const rowElement = document.createElement("div");
+          rowElement.className = "menu-row";
+          const subCategoryDiv = document.createElement("div");
+          const subCategoryTitle = document.createElement("h3");
+          const subCategoryTitleBr = document.createElement("br");
+          subCategoryTitle.textContent = subCategory;
+          // subCategoryDiv.appendChild(subCategoryTitle);
+          // mainSubCategoryDiv.appendChild(subCategoryDiv);
+          // mainSubCategoryDiv.appendChild(subCategoryTitleBr);
+          categoryDiv.appendChild(subCategoryTitle);
+          // mainSubCategoryDiv.appendChild(rowElement);
+          // categoryDiv.appendChild(mainSubCategoryDiv);
+
+          categories[category][subCategory].forEach(itemData => {
+            const itemElement = document.createElement("div");
+            itemElement.className = "menu-item";
+            itemElement.innerHTML = `
+          <img src="${itemData.image}" alt="${itemData.name}">
+          <span>${itemData.name}</span>
+          <span style="color: green;">${itemData.price}</span>
+          <span>${itemData.category}</span>
+          <span>${itemData.subCategory}</span>
+          <span>${itemData.description}</span>
+          <div class="menu-item-buttons" >
+          <button class="menu-item-delete-button" onclick="deleteExistingItem('${itemData.id}')">Delete</button><br>
+          <button class="menu-item-edit-button" onclick="editExistingItem('${itemData.id}', '${itemData.name}', ${itemData.price}, '${itemData.category}', '${itemData.subCategory}')">Edit</button>
+        </div>
+        `;
+            rowElement.appendChild(itemElement);
+          });
+
+          categoryDiv.appendChild(rowElement);
+        });
+
+        menuContainer.appendChild(categoryDiv);
+      });
+    }
+
+    // Call the function to load menu items when the page loads
+    window.onload = fetchMenuItems;
+
+    // Add your functions for adding, editing, and deleting items here
+    function addItem() {
+      document.querySelector("#dummyItem").style.display = "block";
+
+      const newItemImageInput = document.getElementById("newItemImage");
+      const dummyImage = document.getElementById("dummyImage");
+
+      newItemImageInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          dummyImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function doneItem() {
+      const name = document.getElementById("newItemName").value.replace(/\s+/g, '-');
+      const price = document.getElementById("newItemPrice").value;
+      const image = document.getElementById("dummyImage").src;
+      const category = document.getElementById("Category").value;
+      const subCategory = document.getElementById("subCategory").value;
+      const description = document.getElementById("newItemDescription").value;
+
+      if (name && price) {
+        try {
+          await setDoc(doc(db, "menu-items", name), {
+            name: name,
+            price: price,
+            image: image,
+            category: category,
+            subCategory: subCategory,
+            description: description,
+          });
+
+          alert("Item added successfully!");
+          window.location.reload();
+        } catch (error) {
+          console.error("Error adding item: ", error);
+        }
+      } else {
+        alert("Please fill all fields.");
+      }
+    }
+
+    async function deleteExistingItem(itemId) {
+      try {
+        await deleteDoc(doc(db, "menu-items", itemId));
+        console.log("Item deleted successfully!");
+        document.getElementById("menuContainer").innerHTML = "";
+        fetchMenuItems();
+      } catch (error) {
+        console.error("Error deleting item: ", error);
+      }
+    }
+
+    async function editExistingItem(itemId, currentName, currentPrice, currentCategory, currentSubCategory) {
+      const newName = prompt("Enter new name:", currentName);
+      const newPrice = prompt("Enter new price:", currentPrice);
+
+
+      // Ensure all fields are filled before updating the item
+      if (newName !== null && newPrice !== null) {
+        try {
+          await updateDoc(doc(db, "menu-items", itemId), {
+            name: newName,
+            price: parseFloat(newPrice),
+
+          });
+          console.log("Item updated successfully!");
+          document.getElementById("menuContainer").innerHTML = "";
+          fetchMenuItems(); // Refresh the menu items after updating
+        } catch (error) {
+          console.error("Error updating item: ", error);
+        }
+      } else {
+        console.log("Please fill in all fields.");
+      }
+    }
+
+    window.addItem = addItem;
+    window.doneItem = doneItem;
+    window.deleteExistingItem = deleteExistingItem;
+    window.editExistingItem = editExistingItem;
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Your existing styles */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: white;
+      background-image: url(cakeBackground.jpg);
+
+    }
+
+    /* Styles for form container */
+    .container {
+      width: 100%;
+      max-width: 400px;
+      /* Set maximum width of the form container */
+      margin: auto;
+      padding: 20px;
+    }
+
+    /* Styles for form inputs */
+    input[type=date],
+    input[type=number],
+    input[type=text],
+    input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      color: darkgreen;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* Styles for submit button */
+    input[type=submit],
+    button {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type=submit]:hover,
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Styles for message div */
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    /* Media query for smaller screens */
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+    }
+
+    /* Styles for modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modals {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      color: green;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .modal-contents {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      color: red;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .modal-contentss {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      color: red;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .modal-contentsss {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      color: red;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .modal-contentssss {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      color: red;
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .closes {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .closess {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .closesss {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .closessss {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    big {
+      color: green;
+    }
+
+    #topBar {
+      height: 45px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+
+      z-index: 3;
+    }
+
+    .topBarH4Div span {
+      color: green;
+      font-size: 40px;
+      justify-self: center;
+      align-self: center;
+    }
+
+    .topBarH4Div {
+      font-weight: bold;
+      width: 100%;
+      height: 60px;
+      display: flex;
+      align-content: center;
+      justify-content: center;
+      justify-items: center;
+    }
+
+
+
+    #signup {
+      width: 100%;
+
+      color: blue;
+      text-decoration: none;
+      align-self: center;
+      background-color: #45a049;
+    }
+
+    #signupDiv {
+
+      padding-left: 20px;
+      height: 40;
+      text-decoration: none;
+      border-style: dashed;
+      border-width: 1;
+
+    }
+
+    .signUpHereText {
+      animation: ab 0.70s infinite;
+      color: darkgreen;
+      margin: 0px;
+    }
+
+
+
+    @keyframes a {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes ab {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+
+    @keyframes b {
+      0% {
+        border-width: 5;
+      }
+
+      50% {
+        border-width: 0;
+      }
+
+      100% {
+        border-width: 5;
+      }
+    }
+
+    #aDiv {
+      padding-top: 20px;
+      text-align: center;
+
+    }
+
+    #aDiv big {
+
+      text-align: center;
+
+
+    }
+
+    #off {
+      text-align: center;
+      animation: a 0.70s infinite;
+      padding-top: 25px;
+    }
+
+    #off big {
+
+      text-align: center;
+      font-size: 25px;
+    }
+
+    .slider_container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .slider {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      animation: 30s cubic-bezier(1, 0.95, 0.565, 1) sliding infinite;
+    }
+
+    .slide {
+      position: relative;
+      min-width: 100%;
+      height: 100%;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide.one {
+      background: linear-gradient(180deg, white, lightgreen, darkgreen)
+    }
+
+    .slide.two {
+      /* background: rgb(255, 64, 64); */
+    }
+
+    .slide.three {
+      /* background: rgb(11, 173, 188);
+ */
+    }
+
+    .slide.four {
+      /* background: rgb(11, 188, 14); */
+    }
+
+    .slide.five {
+      /* background: rgb(173, 11, 188); */
+    }
+
+    @keyframes sliding {
+      0% {
+        transform: translateX(0%);
+      }
+
+      20% {
+        transform: translateX(0%);
+      }
+
+      25% {
+        transform: translateX(-100%);
+      }
+
+      45% {
+        transform: translateX(-100%);
+      }
+
+      50% {
+        transform: translateX(-200%);
+      }
+
+      70% {
+        transform: translateX(-200%);
+      }
+
+      75% {
+        transform: translateX(-300%);
+      }
+
+      95% {
+        transform: translateX(-300%);
+      }
+
+      100% {
+        transform: translateX(-400%);
+      }
+    }
+
+    .sliderImage1 {
+      padding-left: 20px;
+    }
+
+    .sliderImage2 {
+      padding-right: 20px;
+    }
+
+    .sliderImageAll {
+      padding-top: 30px;
+      justify-content: space-between;
+      display: flex;
+    }
+
+    legend {
+      padding: 0 10px;
+      background-color: white;
+      color: #333;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    #whatsappIcon {
+      position: fixed;
+      right: 10px;
+      bottom: 25px;
+      background-color: black;
+      z-index: 1000;
+      visibility: visible;
+      height: 45px;
+      width: 45px;
+      border-radius: 7px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-width: 4px;
+      border-style: bold;
+      border-color: green;
+    }
+
+    @keyframes a {
+      0% {
+        display: none;
+      }
+
+      50% {
+        display: none;
+      }
+
+      100% {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <div id="whatsappIcon" onclick="openWhatsapp()">
+    <i class="fa-brands fa-whatsapp fa-beat fa-2xl" style="color: #00ff40;"></i>
+  </div>
+  <script>
+    function openWhatsapp() {
+      window.open("https://wa.me/9664478500")
+    }
+  </script>
+  <div class="container">
+    <div id="topBar">
+      <div class="topBarH4Div">
+        <span>eekh</span>
+      </div>
+      <!-- <div class="topBarImgDiv" >
+             <img class="topBarImg" src="menuImage.png" alt="sad">
+        </div> -->
+    </div>
+
+    <section class="slider_container">
+      <section class="slider">
+        <div class="slide first" style="border-width: 2px; border-style: solid; border-color: red;">
+          <img style="animation: a 2s infinite;" src="sliderImage6.png" alt="" />
+          <span style="animation: a 2s infinite;" class="caption"> slide first </span>
+
+
+          <div class="slide one">
+
+            <div class="sliderImageAll">
+
+
+
+
+              <div class="sliderImage1">
+                <img class="myImage1" src="cake1.jpeg" alt="image"
+                  style="width:80px;  height: 80px; border-style: solid; border-width: 5; animation: b 1s infinite;">
+              </div>
+              <div id="off">
+                <big><big><u><span>*Rs.100 off*</span></u></big></big>
+              </div>
+              <div class="sliderImage2">
+                <img class="myImage2" src="cake1.jpeg" alt="image"
+                  style="width:80px;  height: 80px; border-style: solid; border-width: 5; animation: b 1s infinite;">
+              </div>
+
+            </div>
+            <div id="aDiv">
+              <big style="color: #fefefe;">Please Fill the Below Feilds You will get</big>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="slide two">
+          <img src="coffeeSlider.png" alt="" />
+          <span class="caption"> slide two </span>
+        </div>
+        <div class="slide three">
+          <img src="sliderImage3.jpeg" alt="" />
+          <span class="caption"> slide three </span>
+        </div>
+        <div class="slide four">
+          <img src="sliderImage4.jpeg" alt="" />
+          <span class="caption"> slide four </span>
+        </div>
+        <div class="slide five">
+          <img src="sliderImage5.jpeg" alt="" />
+          <span class="caption"> slide five </span>
+        </div>
+
+
+      </section>
+    </section>
+
+
+
+
+
+
+    <script>
+      const images1 = ['cake1.jpeg', 'cake2.jpeg', 'cake3.jpeg', 'cake4.jpeg', 'cake5.jpeg']
+      const images2 = ['cake2.jpeg', 'cake3.jpeg', 'cake4.jpeg', 'cake5.jpeg', 'cake1.jpeg']
+      let currentIndex1 = 0;
+      let currentIndex2 = 0;
+
+      function changeImage() {
+        const imgs1 = document.querySelectorAll('.myImage1');
+        const imgs2 = document.querySelectorAll('.myImage2');
+        currentIndex1 = (currentIndex1 + 1) % images1.length;
+        currentIndex2 = (currentIndex2 + 1) % images2.length;
+        imgs1.forEach(img => img.src = images1[currentIndex1]);
+        imgs2.forEach(img => img.src = images2[currentIndex2]);
+
+      }
+
+      setInterval(changeImage, 1000)
+    </script>
+
+
+
+
+
+    <h2 style="margin: 0px; margin-top: 10px; margin-bottom: 3px;">Login</h2>
+
+    <form id="login-form">
+      <fieldset style="background: linear-gradient(45deg, purple,green);">
+        <legend style="background-color: white;">Mobile Number</legend>
+        <input type="text" id="mobile" name="mobile" required placeholder="Please Enter Your Mobile Number"
+          maxlength="10" />
+      </fieldset>
+      <fieldset style="margin-top: 10px; background: linear-gradient(45deg, purple,green);">
+        <legend style="background-color: white;">Password</legend>
+        <input type="text" id="password" name="password" required placeholder="Please Enter Your Password"
+          style="border: none; color: darkgreen;" />
+      </fieldset>
+      <button type="submit">Login</button>
+      <div id="signupDiv"><a href="signUp.html" id="signup">
+          <h3 style="margin: 10px;">Not Registered Yet? <span class="signUpHereText">Sign Up Here</span></h3>
+        </a></div>
+
+    </form>
+    <button id="forgotpassword">Forgot Password?</button>
+    <div id="message"></div>
+    <p><u><b>Our Servings</b></u></p>
+
+    <hr>
+    <pre><b>1.  <a href ="cake.html">Cake</a></b></pre>
+    <pre><b>2.  <a href ="pizza.html">Pizza</a></b></pre>
+    <pre><b>3.  <a href ="index.html">Ice Cream</a></b></pre>
+    <pre><b>4.  <a href ="index.html">Cold Coffee</a></b></pre>
+  </div>
+  <hr>
+  <h3>
+    <pre>  Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake1.jpeg" alt="image" style="width:49%; margin-top:5px;"> <img src="cake2.jpeg" alt="image"
+    style="width:49%; margin-top:5px;">
+  <img src="cake3.jpeg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake4.jpeg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake10.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake9.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake6.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake7.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake12.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake14.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <hr>
+  <h3>
+    <pre>  Layer Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake32.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake36.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake33.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake5.jpeg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake30.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake35.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake34.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake37.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake38.jpg" alt="image" style="width:49%; margin-top:2px;">
+  <hr>
+  <h3>
+    <pre>  Anniversary Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake16.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake11.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake15.jpg" alt="image" style="width:49%; margin-top:2px;">
+  <hr>
+  <h3>
+    <pre>  Girls Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake31.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake42.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake18.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake19.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <hr>
+  <h3>
+    <pre>  Boys Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake39.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake29.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake8.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake24.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake41.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake40.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake28.jpg" alt="image" style="width:49%; margin-top:2px;">
+  <hr>
+  <h3>
+    <pre>  Photo Cake</pre>
+  </h3>
+  <hr>
+  <img src="cake20.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake22.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+  <img src="cake21.jpg" alt="image" style="width:49%; margin-top:2px;"> <img src="cake23.jpg" alt="image"
+    style="width:49%; margin-top:2px;">
+
+  <div id="resetPasswordModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeresetmodal">&times;</span>
+      <h2>Reset Password</h2>
+      <input type="text" id="reset-mobile" placeholder="Enter your registered mobile number" required>
+      <button id="sendOtpButton">Send OTP</button>
+
+      <div id="otpSection" style="display:none;">
+        <input type="text" id="otp" placeholder="Enter OTP" required>
+        <button id="verifyotp">Verify OTP</button>
+      </div>
+
+      <div id="newPasswordSection" style="display:none;">
+        <input type="password" id="new-password" placeholder="Enter new password" required>
+        <button id="resetpassword">Reset Password</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+    import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+    import { getAuth, signInWithPhoneNumber, RecaptchaVerifier, PhoneAuthProvider, signInWithCredential } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+      authDomain: "eekh-website.firebaseapp.com",
+      projectId: "eekh-website",
+      storageBucket: "eekh-website.appspot.com",
+      messagingSenderId: "276234231567",
+      appId: "1:276234231567:web:1509267f60d97a83cea87a",
+      measurementId: "G-QX5HCKXMDK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const loginForm = document.getElementById('login-form');
+    const messageDiv = document.getElementById('message');
+    let currentResetMobile = null;  // To store the mobile number for the current reset process
+    let otpVerificationId = null;   // To store the verification ID after sending OTP
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const mobile = loginForm.mobile.value;
+      const password = loginForm.password.value;
+
+      try {
+        const userRef = doc(db, 'users', mobile);
+        const docSnap = await getDoc(userRef);
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          if (userData.password === password) {
+            // Redirect to login.html if credentials match
+            window.location.href = `login.html?mobile=${encodeURIComponent(mobile)}`;
+          } else {
+            alert('Mobile Number or Password is Incorrect!! Please Try Again');
+          }
+        } else {
+          alert('Not Registered!! Please Sign Up');
+          window.location.href = 'signUp.html';
+        }
+      } catch (error) {
+        console.error('Error signing in:', error);
+        alert('Error signing in. Please try again.');
+      }
+    });
+
+    document.getElementById('signup').addEventListener('click', () => {
+      window.location.href = 'signUp.html';
+    });
+
+    function openResetModal() {
+      document.getElementById('resetPasswordModal').style.display = 'block';
+    }
+
+    document.getElementById('forgotpassword').addEventListener('click', () => {
+      openResetModal();
+    });
+
+    document.getElementById('sendOtpButton').addEventListener('click', () => {
+      sendOtp();
+    });
+
+    document.getElementById('verifyotp').addEventListener('click', () => {
+      verifyOtp();
+    });
+
+    document.getElementById('resetpassword').addEventListener('click', () => {
+      resetPassword();
+    });
+
+    document.getElementById('closeresetmodal').addEventListener('click', () => {
+      closeResetModal();
+    });
+
+    function closeResetModal() {
+      document.getElementById('resetPasswordModal').style.display = 'none';
+    }
+
+    function sendOtp() {
+      const mobile = document.getElementById('reset-mobile').value;
+
+      // Verify if the mobile number is registered
+      const userRef = doc(db, 'users', mobile);
+      getDoc(userRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          // Mobile number exists, proceed to send OTP
+          currentResetMobile = mobile;
+
+          // Set up reCAPTCHA
+          window.recaptchaVerifier = new RecaptchaVerifier('sendOtpButton', {
+            'size': 'invisible',
+            'callback': () => {
+              // reCAPTCHA solved, allow send OTP
+            }
+          }, auth);
+
+          // Send OTP to the mobile number
+          const appVerifier = window.recaptchaVerifier;
+          signInWithPhoneNumber(auth, `+91${mobile}`, appVerifier)
+            .then((confirmationResult) => {
+              otpVerificationId = confirmationResult.verificationId;
+              document.getElementById('otpSection').style.display = 'block';
+            })
+            .catch((error) => {
+              alert('Error sending OTP. Please try again.');
+              console.error('Error sending OTP: ', error);
+            });
+        } else {
+          alert('Mobile number is not registered!');
+        }
+      }).catch((error) => {
+        console.error('Error checking mobile number:', error);
+        alert('Error checking mobile number. Please try again.');
+      });
+    }
+
+    function verifyOtp() {
+      const otp = document.getElementById('otp').value;
+
+      if (otpVerificationId && otp) {
+        const credential = PhoneAuthProvider.credential(otpVerificationId, otp);
+
+        signInWithCredential(auth, credential)
+          .then(() => {
+            // OTP is correct, allow user to reset password
+            document.getElementById('newPasswordSection').style.display = 'block';
+          })
+          .catch((error) => {
+            console.error('Error verifying OTP: ', error);
+            alert('Invalid OTP!');
+          });
+      }
+    }
+
+    function resetPassword() {
+      const newPassword = document.getElementById('new-password').value;
+
+      if (currentResetMobile && newPassword) {
+        const userRef = doc(db, 'users', currentResetMobile);
+
+        updateDoc(userRef, { password: newPassword })
+          .then(() => {
+            alert('Password reset successfully!');
+            closeResetModal();
+          })
+          .catch((error) => {
+            console.error('Error resetting password: ', error);
+            alert('Failed to reset password!');
+          });
+      }
+    }
+  </script>
+
+
+
+
+
+</body>
+
+</html>

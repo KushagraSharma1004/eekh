@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: url('cakeBackground.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Poppins', sans-serif;
+            overflow: 'hidden';
+
+        }
+
+        .container {
+            animation: fadeIn 1.5s ease-in-out;
+            color: #333;
+
+            flex-direction: column;
+            display: flex;
+            width: 100%;
+            max-width: 400px;
+            /* Set maximum width of the form container */
+
+
+        }
+
+        .myOrdersDiv {
+
+            width: 99%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            justify-self: center;
+            align-self: center;
+            flex-direction: column;
+            background-color: 'blue';
+            position: absolute;
+            top: 1px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 600;
+            margin-bottom: 1px;
+            color: #fff;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            animation: slideDown 1s ease-out;
+            margin-top: 0px;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #ordersContainer {
+            padding-top: 0px;
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            /* background-blend-mode: color-burn;  */
+            /* background-color:transparent; */
+            background-color: hsla(0, 0%, 100%, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            flex-direction: row;
+            overflow-y: auto;
+            max-height: 90vh;
+            animation: growIn 1s ease-in-out;
+            margin-bottom: 70px;
+        }
+
+
+
+        @keyframes growIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .order-item {
+            display: flex;
+
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.5s ease-in-out both;
+            border-left: 5px solid #007bff;
+        }
+
+        /* .order-item:nth-child(odd) {
+            border-left-color: #28a745;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+
+        .order-item:nth-child(even) {
+            border-left-color: #ffc107;
+            background-color: rgba(240, 240, 240, 0.95);
+        } */
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .order-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .order-item {
+            flex-direction: column;
+            overflow: hidden;
+
+        }
+
+        .order-item img {
+            height: 60px;
+            width: 60px;
+
+            border-radius: 7px;
+            object-fit: cover;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: bounceIn 0.6s ease;
+        }
+
+        @keyframes bounceIn {
+
+            from,
+            20%,
+            40%,
+            60%,
+            80%,
+            to {
+                animation-timing-function: ease-in-out;
+            }
+
+            from {
+                opacity: 0;
+                transform: scale3d(0.3, 0.3, 0.3);
+            }
+
+            20% {
+                transform: scale3d(1.1, 1.1, 1.1);
+            }
+
+            40% {
+                transform: scale3d(0.9, 0.9, 0.9);
+            }
+
+            60% {
+                opacity: 1;
+                transform: scale3d(1.03, 1.03, 1.03);
+            }
+
+            80% {
+                transform: scale3d(0.97, 0.97, 0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale3d(1, 1, 1);
+            }
+        }
+
+        .order-item div {
+            display: flex;
+            flex-direction: row;
+            flex-grow: 1;
+            animation: fadeInRight 0.6s ease-in-out;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .order-item span {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .order-item strong {
+            color: #007bff;
+            font-weight: 600;
+
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: right;
+            color: #999;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .back-button {
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+            height: 40px;
+            width: 40px;
+            background-color: black;
+            position: absolute;
+            z-index: 3;
+        }
+
+
+        .kushu {
+            flex-direction: column;
+            margin-top: 10px;
+        }
+
+        .nameQuantityPrice {
+            border-radius: 7px;
+            flex-direction: row;
+            /* align-items: center; */
+
+            justify-content: center;
+        }
+
+        .itemname span {
+            width: 121.2;
+        }
+
+
+        .itemname {
+            border-radius: 7px;
+            /* background-color: blue; */
+            /* align-items: center; */
+            justify-content: center;
+            width: 121.2px;
+
+        }
+
+        .itemname strong {
+
+            color: rgb(230, 134, 134);
+
+        }
+
+        .itemquantity {
+            border-radius: 7px;
+            /* background-color: blueviolet; */
+            /* align-items: center; */
+            justify-content: center;
+        }
+
+        .itemprice {
+            border-radius: 7px;
+            /* background-color: #28a745; */
+            /* align-items: center; */
+            justify-content: center;
+
+        }
+
+        .orderStatusInsideText {
+            /* background-color: red; */
+            height: 30px;
+            align-items: center;
+            border-radius: 7px;
+            font-size: 12px;
+        }
+
+        .orderStatusInsideText2 {
+            /* background-color: red; */
+            height: 30px;
+            align-items: center;
+            border-radius: 7px;
+        }
+
+        .orderTotalAmountInsideText2 {
+            /* background-color: royalblue; */
+            flex-direction: row;
+            align-items: center;
+            font-size: 17px;
+            border-radius: 7px;
+            color: darkgreen;
+            margin-right: -10px;
+
+        }
+
+        .orderTotalAmountInsideText {
+            /* background-color: white; */
+            flex-direction: row;
+            align-items: center;
+            border-radius: 7px;
+            font-size: 12px;
+        }
+
+        .itemPriceInsideText2 {
+            color: black;
+        }
+
+        .topRateBar {
+            height: 30px;
+            background-color: blue;
+            position: absolute;
+            z-index: 3;
+        }
+
+        .order-timestamp {
+            height: 30px;
+        }
+
+        .discountDiv {
+            position: absolute;
+            bottom: 40px;
+            right: 30px;
+        }
+
+        .subTotal {
+            position: absolute;
+            bottom: 60px;
+            right: 30px;
+        }
+
+        .discountDiv strong {
+            font-size: 12px;
+        }
+
+        .subTotal strong {
+            font-size: 12px;
+        }
+
+
+
+        .subTotal span span,
+        .discountDiv span span,
+        .itemPriceInsideText2 {
+            font-size: 14px;
+        }
+
+        #rightMenuBar {
+            visibility: hidden;
+            width: 250px;
+            height: 355px;
+            position: fixed;
+            right: 0px;
+            bottom: 70px;
+            z-index: 100;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            transform: translateY(100%);
+            /* Start off-screen */
+            transition: transform 0.5s ease;
+            /* I want that it should come from down to it actual position */
+            /* animation: rightMenuBarAnimation 0.5s ease-out forwards; */
+        }
+
+        #rightMenuBar.show {
+            transform: translateY(0);
+            animation: rightMenuBarAnimation 1s ease-in-out 1;
+
+            visibility: visible;
+            /* Move to its original position */
+        }
+
+
+        @keyframes rightMenuBarAnimation {
+
+            /* 10% {
+       opacity: 0.10;
+    } 50% {
+        opacity: 0.50;
+    } 80% {
+        opacity: 0.80;
+    } 100% {
+        opacity: 1;
+    } */
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="rightMenuBar">
+        <div style="margin-left: 20px;">
+            <span style="font-size: 20px; font-weight: 800; color: darkgreen;">eekh</span>
+            <img style="height: 20px; width: 20px; position: absolute; right: 10px; top: 10px;" src="crossImage.png"
+                alt="cross" onclick="closeMenu()">
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToIndex()">
+                <img style="height: 20px; width: 20px;" src="logoutImage.png" alt="logout">
+                <span style="margin-left: 10px;">Logout</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToWallet()">
+                <img onclick="goToWallet()" src="walletImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">Wallet</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyOrders()">
+                <img onclick="goToMyOrders()" src="myOrdersImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Orders</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToCart()">
+                <img onclick="goToCart()" src="cartImage.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Cart</span>
+            </div>
+
+            <div style="align-items: center; align-content: center;height: 20px; display: flex; margin-top: 10px; cursor: pointer;"
+                onclick="goToMyReffered()">
+                <img onclick="goToMyReffered()" src="referralLogo.png" style="height: 20px; width: 20px;" alt="logout">
+                <span style="margin-left: 10px;">My Referrals</span>
+            </div>
+        </div>
+    </div>
+
+    <div
+        style="display: flex; background-color: white; height: 70px; align-content: center; position: fixed; bottom: 0px; width: 100%; justify-content: space-between; margin-left: -10px; z-index: 999;">
+        <img onclick="goToWallet()" src="walletImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <img onclick="goToMyOrders()" src="myOrdersImage.png" alt="" style="height: 50px;width: 50;  margin-top: 10px;">
+        <button
+            style="width:fit-content; background-color: transparent; padding: 0px; margin-top: -10px; border: 0px; border-radius: 0px; cursor:none;"
+            id="goToCartImage" onclick="goToCart()"><img src="cartImage.png" alt=""
+                style="height: 50px;width: 50;  margin-top: 10px; "></button>
+        <img style="height: 50px;width: 50;  margin-top: 10px;" class="topBarImg" src="menuImage.png" alt="sad"
+            onclick="openMenu()">
+
+    </div>
+
+    <img class="back-button" onclick="goToCart()" src="backImage.jpg" alt="Back">
+
+    <div class='container'>
+        <div class="myOrdersDiv">
+            <h1>My Orders</h1>
+
+            <div id="ordersContainer"></div>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjpg5dNL6R44dPpoDQabNaT8tLVmVWTQQ",
+            authDomain: "eekh-website.firebaseapp.com",
+            projectId: "eekh-website",
+            storageBucket: "eekh-website.appspot.com",
+            messagingSenderId: "276234231567",
+            appId: "1:276234231567:web:1509267f60d97a83cea87a",
+            measurementId: "G-QX5HCKXMDK"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const queryParams = new URLSearchParams(window.location.search);
+        const mobile = queryParams.get('mobile');
+
+        async function loadOrders() {
+            const ordersRef = collection(db, 'users', mobile, 'orders');
+            const querySnapshot = await getDocs(ordersRef);
+            const ordersContainer = document.getElementById('ordersContainer');
+            ordersContainer.innerHTML = '';
+
+            const sortedDocs = querySnapshot.docs.sort((a, b) => {
+                return b.data().timestamp.toDate() - a.data().timestamp.toDate();
+            });
+
+            sortedDocs.forEach(doc => {
+                const order = doc.data();
+                const orderElement = document.createElement('div');
+                orderElement.className = 'order-item';
+
+                // Get and format the timestamp
+                const orderDate = order.timestamp.toDate();
+                const formattedTime = orderDate.toLocaleString();
+
+                // Create a container for the timestamp
+                const timestampElement = document.createElement('div');
+                timestampElement.className = 'order-timestamp';
+                timestampElement.innerHTML = `<strong>Time:</strong> <pre> </pre>  ${formattedTime}<br>`;
+
+                // Append the timestamp to the order element
+                orderElement.appendChild(timestampElement);
+
+                // Initialize total calculated amount
+                let totalCalculatedAmount = 0;
+
+                order.order.forEach(item => {
+                    // Shorten the item name if it exceeds a certain length
+                    const maxLength = 10; // Define the max number of characters
+                    let itemName = item.itemName;
+
+                    // Function to truncate text at word or punctuation boundary
+                    function truncateText(text, maxLength) {
+                        if (text.length <= maxLength) return text;
+                        let truncated = text.slice(0, maxLength);
+                        const lastChar = truncated.slice(-1);
+                        if (lastChar !== ' ' && lastChar !== '-' && lastChar !== '.') {
+                            // Ensure truncation happens at a space or hyphen if possible
+                            const lastSpaceIndex = truncated.lastIndexOf(' ');
+                            const lastHyphenIndex = truncated.lastIndexOf('-');
+                            const truncationIndex = Math.max(lastSpaceIndex, lastHyphenIndex);
+                            truncated = text.slice(0, truncationIndex > 0 ? truncationIndex : maxLength);
+                        }
+                        return truncated + ' ..';
+                    }
+
+                    itemName = truncateText(itemName, maxLength);
+
+                    // Calculate the total amount for the item
+                    const itemTotal = item.itemPrice * item.quantity;
+                    totalCalculatedAmount += itemTotal;
+
+                    const itemElement = document.createElement('div');
+                    itemElement.innerHTML = `
+                <div style='flex-direction:row'>
+                    <div class='kushu'>
+                        <img src="${item.itemImage}" alt="${itemName}">
+                        <div class="nameQuantityPrice">
+                            <div class='itemname'><span><strong>${itemName}</strong></span></div>
+                            <div class='itemquantity'><span>${item.quantity}</span></div>
+                            <div class='itemprice'><span><div class='itemPriceInsideText2'>Rs. ${item.itemPrice}</span></div></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+                    orderElement.appendChild(itemElement);
+                });
+
+                // Get the totalAmount from the database
+                const totalAmountFromDb = order.totalAmount;
+                // console.log(totalAmountFromDb);
+
+                // Calculate the difference
+                const difference = totalAmountFromDb - totalCalculatedAmount;
+                // console.log(difference)
+
+                // Append the order details including calculated total and difference
+                orderElement.innerHTML += `
+            <div class="status">
+                <div class='orderStatusText'>
+                    <div class='orderStatusInsideText'><strong>Status:</strong></div> 
+                    <div class='orderStatusInsideText2'>${order.status}<br></div>
+                </div>
+                <div class='orderTotalAmountText'>
+                    <div class='orderTotalAmountInsideText'><strong>Total Amount:</strong></div> 
+                    <div class='orderTotalAmountInsideText2'>Rs. ${totalAmountFromDb}</div>
+                    
+                </div>
+            </div>
+        `;
+
+                ordersContainer.appendChild(orderElement);
+
+
+
+                const discountDiv = document.createElement('div');
+                discountDiv.className = 'discountDiv';
+                // orderElement.className = 'order-item';
+                discountDiv.innerHTML += `<span> <strong>Discount: </strong> <span> ${difference} </span></span>
+                    `
+                const subTotal = document.createElement('div');
+                subTotal.className = 'subTotal';
+                subTotal.innerHTML += `<span> <strong> Sub Total: </strong><span>  ${totalCalculatedAmount} </span></span>
+                    `
+                // discountDiv.appendChild(subTotal);
+                orderElement.appendChild(discountDiv);
+                orderElement.appendChild(subTotal);
+
+
+                // Style the order status
+                const statusValueElement = orderElement.querySelector('.orderStatusInsideText2');
+                if (statusValueElement.textContent.includes('Approved')) {
+                    statusValueElement.style.color = 'lightgreen';
+                    orderElement.style.borderLeftColor = 'lightgreen';
+                } else if (statusValueElement.textContent.includes('Pending')) {
+                    statusValueElement.style.color = 'rgb(255, 255, 13)';
+                    orderElement.style.borderLeftColor = 'rgb(255, 255, 13)';
+                } else {
+                    statusValueElement.style.color = 'red';
+                    orderElement.style.borderLeftColor = 'red';
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+
+        function goToCart() {
+            window.location.href = 'Cart.html?mobile=' + mobile;
+        }
+        function goToWallet() {
+            window.location.href = `wallet.html?mobile=${mobile}`;
+        }
+        function goToMyOrders() {
+            window.location.href = `myOrders.html?mobile=${mobile}`;
+        }
+        function goToIndex() {
+            window.location.href = `index.html?`;
+        }
+
+        //This function opens the right menu bar
+        function openMenu() {
+            //Get the right menu bar element
+            const rightMenuBar = document.getElementById('rightMenuBar');
+            // rightMenuBar.classList.toggle('show');
+
+            if (rightMenuBar.classList.contains('show')) {
+                rightMenuBar.classList.remove('show');
+                // setTimeout(() => rightMenuBar.style.visibility = 'hidden', 500); // Hide after transition
+            } else {
+                rightMenuBar.style.visibility = 'visible'; // Make visible before sliding up
+                rightMenuBar.classList.add('show');
+            }
+            //Set the visibility of the right menu bar to visible
+            // rightMenuBar.style.visibility = 'visible';
+
+
+            // if (rightMenuBar.style.visibility === 'hidden' || rightMenuBar.style.visibility === '') {
+            //     rightMenuBar.style.visibility = 'visible';
+            //     rightMenuBar.style.animation = 'rightMenuBarAnimation 0.5s ease-out forwards';
+            // } else {
+            //     rightMenuBar.style.visibility = 'hidden';
+            // }
+        }
+        function closeMenu() {
+            const rightMenuBar = document.getElementById('rightMenuBar');
+            rightMenuBar.style.visibility = 'hidden';
+        }
+
+        function goToMyReffered() {
+            window.location.href = `myReffered.html?mobile=${mobile}`;
+        }
+
+        window.goToCart = goToCart;
+        window.openMenu = openMenu;
+        window.closeMenu = closeMenu;
+        window.goToIndex = goToIndex;
+        window.goToMyOrders = goToMyOrders;
+        window.goToWallet = goToWallet;
+        window.goToMyReffered = goToMyReffered;
+
+
+        window.goToCart = goToCart;
+        loadOrders();
+    </script>
+</body>
+
+</html>
